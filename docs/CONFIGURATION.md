@@ -113,6 +113,18 @@ type).
 | `natsumi.home.disabled` | boolean | — | Disable the Noir home page |
 | `natsumi.home.custom-background` | boolean | — | Use the configured background on the home page |
 
+## Startup
+
+| Pref | Type | Values | Description |
+|---|---|---|---|
+| `natsumi.startup.type` | string | `default` (disabled), `simple`, `nostalgic` | Startup animation |
+| `natsumi.startup.icon` | string | `default`, `kawaii`, `pride`, `stardust`, `custom` | Icon shown during the startup animation. `default` follows the theme (glass, or pride with the LGBTQ+ theme); `custom` uses the uploaded image |
+| `natsumi.startup.custom-icon-id` | string | file ID | Uploaded icon (set through Settings → Customize Noir → Startup) |
+| `natsumi.startup.sound` | string | `default` (none), `borealis`, `custom` | Startup sound |
+| `natsumi.startup.custom-sound-id` | string | file ID | Uploaded sound (set through Settings) |
+
+The custom icon is stored in the profile under `natsumi-uploads/` (JSON-wrapped data URL).
+
 ## Compatibility, updates and language
 
 | Pref | Type | Values | Description |

@@ -33,6 +33,9 @@ KEEP_ENGLISH = {
     'Lucid', 'Tinted Haze', 'Mica', 'Mica Alt', 'Floorp Hub', 'Starlight Design 2',
     'Aero', 'Frutiger Aero', 'Borealis', 'Combines', 'Glimpse', 'Miniplayer',
     'Nova',
+    'Kawaii',
+    'Pride',
+    'Stardust',
 }
 
 QUOTED = re.compile(r'"([^"\\\n]{2,400})"')

@@ -445,6 +445,10 @@ class NatsumiDefaultStartupAnimation extends NatsumiBaseStartupAnimation {
         // Add icon
         let iconContainer = document.createElement("div");
         iconContainer.id = "natsumi-startup-icon";
+        let startupIconUrl = await getStartupIconUrl();
+        if (startupIconUrl) {
+            iconContainer.style.backgroundImage = `url("${startupIconUrl}")`;
+        }
         this.startupNode.appendChild(iconContainer);
 
         // Add quote
@@ -525,6 +529,10 @@ class NatsumiXPStartupAnimation extends NatsumiBaseStartupAnimation {
         // Add icon
         let iconContainer = document.createElement("div");
         iconContainer.id = "natsumi-startup-xp-icon";
+        let startupIconUrl = await getStartupIconUrl();
+        if (startupIconUrl) {
+            iconContainer.style.backgroundImage = `url("${startupIconUrl}")`;
+        }
         xpLogoContainer.appendChild(iconContainer);
 
         // Add text
@@ -1201,6 +1209,38 @@ function setupInitialConfig() {
     Services.startup.quit(
         Ci.nsIAppStartup.eRestart | Ci.nsIAppStartup.eAttemptQuit
     );
+}
+
+const startupIconFiles = {
+    "kawaii": "chrome://natsumi/content/icons/natsumi-kawaii.png",
+    "pride": "chrome://natsumi/content/icons/natsumi-pride.png",
+    "stardust": "chrome://natsumi/content/icons/natsumi-stardust.png"
+};
+
+async function getStartupIconUrl() {
+    let startupIcon = "default";
+    if (ucApi.Prefs.get("natsumi.startup.icon").exists()) {
+        startupIcon = ucApi.Prefs.get("natsumi.startup.icon").value;
+    }
+
+    // "default" keeps the CSS default (glass, or pride with the LGBTQ+ theme)
+    if (startupIcon === "default") {
+        return null;
+    }
+
+    if (startupIcon === "custom") {
+        if (ucApi.Prefs.get("natsumi.startup.custom-icon-id").exists()) {
+            try {
+                const startupIconFile = await getFile(ucApi.Prefs.get("natsumi.startup.custom-icon-id").value);
+                return startupIconFile.data;
+            } catch(e) {
+                console.error("Failed to get startup icon file:", e);
+            }
+        }
+        return null;
+    }
+
+    return startupIconFiles[startupIcon] ?? null;
 }
 
 async function runStartupAnimation() {

@@ -1274,6 +1274,12 @@ SOFTWARE.
     }
   }
 
+  @media not -moz-pref("natsumi.startup.icon", "custom") {
+    #natsumiIconPicker {
+      display: none !important;
+    }
+  }
+
   .natsumi-settings-info {
     --natsumi-info-color: #00aaff;
     padding: 10px;

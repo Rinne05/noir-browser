@@ -25,6 +25,8 @@
 - **Keyboard shortcuts** — full rebinding with conflict handling policies.
 - **Settings UI** — "Customize Noir", "Keyboard Shortcuts" and "About Noir" panes, with Chinese
   localization available.
+- **Startup experience** — optional startup animation (simple or nostalgic), startup sound and a
+  customizable startup icon.
 - **Bento** — export/import your configuration as a `.nbto` bundle.
 - **Auto-update** — version checks against manifests hosted in this repository, with one-click
   installs (full version only).

@@ -874,6 +874,34 @@ const startupAnimations = {
     )
 }
 
+const startupIcons = {
+    "default": new RadioChoice(
+        "default",
+        "Default",
+        ""
+    ),
+    "kawaii": new RadioChoice(
+        "kawaii",
+        "Kawaii",
+        ""
+    ),
+    "pride": new RadioChoice(
+        "pride",
+        "Pride",
+        ""
+    ),
+    "stardust": new RadioChoice(
+        "stardust",
+        "Stardust",
+        ""
+    ),
+    "custom": new RadioChoice(
+        "custom",
+        "Custom",
+        ""
+    )
+}
+
 const startupSounds = {
     "default": new RadioChoice(
         "default",
@@ -2837,6 +2865,62 @@ function addStartupSoundsPane() {
     }
 }
 
+function addStartupIconPane() {
+    let prefsView = document.getElementById("mainPrefPane");
+
+    let startupIconSelection = new RadioPreference(
+        "natsumiStartupIcon",
+        "natsumi.startup.icon",
+        "Startup icon",
+        "Choose the icon to show during the startup animation."
+    );
+
+    for (let startupIcon in startupIcons) {
+        startupIconSelection.registerOption(startupIcon, startupIcons[startupIcon]);
+    }
+
+    let startupIconNode = startupIconSelection.generateNode();
+
+    // Set listeners for each button (RadioPreference does not do this itself)
+    let startupIconButtons = startupIconNode.querySelectorAll(".natsumi-radio-choice");
+    startupIconButtons.forEach(button => {
+        button.addEventListener("click", () => {
+            let selectedValue = button.getAttribute("value");
+            setStringPreference("natsumi.startup.icon", selectedValue);
+            startupIconButtons.forEach((btn) => {
+                btn.removeAttribute("selected");
+                let radioCheck = btn.querySelector(".radio-check");
+                radioCheck.removeAttribute("selected");
+            });
+            button.setAttribute("selected", "true");
+            let radioCheck = button.querySelector(".radio-check");
+            radioCheck.setAttribute("selected", "true");
+        });
+    });
+
+    addToGroupbox(startupIconNode, "natsumiStartup");
+
+    // Create icon picker
+    let customIconPicker = new FileUpload("natsumiIconPicker", "image");
+    customIconPicker.setUploadCallback(() => {
+        const fileId = customIconPicker.currentFile;
+
+        if (fileId) {
+            setStringPreference("natsumi.startup.custom-icon-id", fileId);
+        } else {
+            ucApi.Prefs.get("natsumi.startup.custom-icon-id").reset();
+        }
+    });
+    let customIconPickerNode = customIconPicker.generateNode();
+    let startupIconParent = prefsView.querySelector("#natsumiStartupIconSettings");
+    startupIconParent.appendChild(customIconPickerNode);
+
+    // Set existing file
+    if (ucApi.Prefs.get("natsumi.startup.custom-icon-id").exists) {
+        customIconPicker.setFile(ucApi.Prefs.get("natsumi.startup.custom-icon-id").value);
+    }
+}
+
 function addMiscPreferencesPane() {
     // Create choices group
     let miscPreferencesGroup = new OptionsGroup(
@@ -3174,6 +3258,7 @@ function addPreferencesPanes() {
     );
     addStartupAnimationsPane();
     addStartupSoundsPane();
+    addStartupIconPane();
 
     addGroupbox(
         "natsumiMiscellaneous",

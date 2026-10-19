@@ -494,6 +494,8 @@ export const strings = {
     "Version": "版本",
     "Running on": "运行于",
     "Conflicts with:": "与以下快捷键冲突:",
+    "Startup icon": "启动图标",
+    "Choose the icon to show during the startup animation.": "选择启动动画中显示的图标。",
 
     // ==== Fill-in section ====
     "Based on Lucide": "基于 Lucide",

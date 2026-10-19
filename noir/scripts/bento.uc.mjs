@@ -33,7 +33,8 @@ const themesPath = PathUtils.join(PathUtils.profileDir, "natsumi-themes");
 const uploadsPath = PathUtils.join(PathUtils.profileDir, "natsumi-uploads");
 const shortcutsPath = PathUtils.join(PathUtils.profileDir, "natsumi-shortcuts.json");
 const configsWithFiles = [
-    "natsumi.startup.custom-sound-id"
+    "natsumi.startup.custom-sound-id",
+    "natsumi.startup.custom-icon-id"
 ]
 const canExportConfigs = [
     "natsumi.theme.single-toolbar",
@@ -91,6 +92,7 @@ const canExportConfigs = [
     "natsumi.sidebar.hide-clear-tabs",
     "natsumi.sidebar.hide-workspace-indicator",
     "natsumi.sidebar.workspaces-as-icons",
+    "natsumi.startup.icon",
     "natsumi.tabs.blade-legacy-color",
     "natsumi.tabs.disable-crossout-title",
     "natsumi.tabs.disable-grayout-unloaded",
