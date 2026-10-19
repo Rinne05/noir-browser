@@ -33,6 +33,7 @@ SOFTWARE.
 
 import * as ucApi from "chrome://userchromejs/content/uc_api.sys.mjs";
 import {NatsumiNotification} from "./notifications.sys.mjs";
+import {t, localizeDom} from "./i18n.sys.mjs";
 
 let shortcutsMap = {
     "compactMode": {
@@ -419,7 +420,7 @@ const shortcutXULString = `
         </div>
         <div class="natsumi-shortcut-conflict">
             <div class="natsumi-shortcut-conflict-label">
-                When shortcuts conflict, Natsumi should:
+                When shortcuts conflict, Noir should:
             </div>
             <div class="natsumi-shortcut-conflict-selection">
                 <div class="natsumi-shortcut-conflict-item" value="0">
@@ -428,7 +429,7 @@ const shortcutXULString = `
                         Prefer browser
                     </div>
                     <div class="natsumi-shortcut-conflict-item-description">
-                        When shortcuts conflict, the browser (or Natsumi) wins.
+                        When shortcuts conflict, the browser (or Noir) wins.
                     </div>
                 </div>
                 <div class="natsumi-shortcut-conflict-item" value="3" selected="">
@@ -549,7 +550,7 @@ class NatsumiShortcutsPrefPane {
             if (currentResetButton.hasAttribute("natsumi-confirm-reset")) {
                 this.resetAllShortcuts();
                 currentResetButton.removeAttribute("natsumi-confirm-reset");
-                currentResetButton.textContent = "Reset";
+                currentResetButton.textContent = t("Reset");
 
                 if (this.resetTimeout) {
                     clearTimeout(this.resetTimeout);
@@ -557,7 +558,7 @@ class NatsumiShortcutsPrefPane {
                 }
             } else {
                 currentResetButton.setAttribute("natsumi-confirm-reset", "");
-                currentResetButton.textContent = "Confirm";
+                currentResetButton.textContent = t("Confirm");
 
                 this.resetTimeout = setTimeout(() => {
                     currentResetButton.removeAttribute("natsumi-confirm-reset");
@@ -749,14 +750,14 @@ class NatsumiShortcutsPrefPane {
         }
 
         let notificationObject = new NatsumiNotification(
-            "This keybind cannot be used!",
-            `Conflicts with: ${conflictName}`,
+            t("This keybind cannot be used!"),
+            `${t("Conflicts with:")} ${conflictName}`,
             "chrome://natsumi/content/icons/lucide/warning.svg",
             10000,
             "warning"
         )
         notificationObject.addButton(
-            "Unregister this shortcut",
+            t("Unregister this shortcut"),
             () => {
                 let conflictShortcutObject = browserWindow.gBrowser.ownerDocument.body.natsumiKBSManager.shortcuts[conflictShortcut];
                 let conflictCustomizationData = {
@@ -864,7 +865,7 @@ class NatsumiShortcutsPrefPane {
 
         this.reloadAllShortcuts();
 
-        let notification = new NatsumiNotification("Shortcuts imported successfully!", null, "chrome://natsumi/content/icons/lucide/download.svg");
+        let notification = new NatsumiNotification(t("Shortcuts imported successfully!"), null, "chrome://natsumi/content/icons/lucide/download.svg");
         notification.addToContainer();
     }
 
@@ -879,7 +880,7 @@ class NatsumiShortcutsPrefPane {
         try {
             document.body.appendChild(downloadNode);
             downloadNode.click();
-            let notification = new NatsumiNotification("Shortcuts exported successfully!", null, "chrome://natsumi/content/icons/lucide/upload.svg");
+            let notification = new NatsumiNotification(t("Shortcuts exported successfully!"), null, "chrome://natsumi/content/icons/lucide/upload.svg");
             notification.addToContainer();
         } catch(e) {
             console.error("Failed to export shortcuts data:", e);
@@ -1083,7 +1084,7 @@ class NatsumiShortcutsPrefPane {
         if (shortcutObject.unregistered && !hasOverride) {
             let unassignedDisplay = document.createElement("div");
             unassignedDisplay.classList.add("natsumi-shortcut-unassigned");
-            unassignedDisplay.textContent = "Not assigned";
+            unassignedDisplay.textContent = t("Not assigned");
             keybindDisplay.appendChild(unassignedDisplay);
             shortcutElement.setAttribute("unassigned", "");
             return;
@@ -1234,3 +1235,9 @@ function addToSidebar() {
 addToSidebar();
 let natsumiShortcutsPrefPane = new NatsumiShortcutsPrefPane();
 natsumiShortcutsPrefPane.init();
+
+// Localize our own preferences UI (Chinese translations; English falls through)
+for (let localizeRoot of document.querySelectorAll('[data-category^="paneNatsumi"], [id^="natsumi"]')) {
+    localizeDom(localizeRoot);
+}
+

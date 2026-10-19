@@ -4,7 +4,7 @@ setlocal EnableDelayedExpansion
 :: --- ELEVATION CATCH ---
 :: If re-launched as Admin, load saved variables and jump straight to Step 6
 if "%~1"=="ELEVATED" (
-    if exist "%TEMP%\natsumi_state.cmd" call "%TEMP%\natsumi_state.cmd"
+    if exist "%TEMP%\noir_state.cmd" call "%TEMP%\noir_state.cmd"
     goto :STEP6
 )
 
@@ -29,7 +29,7 @@ if %errorLevel% neq 0 (
 )
 
 :: Temp Dir
-set "TEMP_DIR=%TEMP%\natsumi-installer-temp"
+set "TEMP_DIR=%TEMP%\noir-installer-temp"
 if exist "%TEMP_DIR%" rd /s /q "%TEMP_DIR%"
 mkdir "%TEMP_DIR%"
 
@@ -126,7 +126,7 @@ if not exist "%TARGET_PROFILE%" (
 
 :: --- STEP 3: VERSION SELECTION ---
 echo.
-echo [STEP 3] Select Natsumi Version
+echo [STEP 3] Select Noir Version
 echo.
 echo 1. Stable (Main branch, recommended)
 echo 2. Alpha/Beta/RC (Dev branch, experimental)
@@ -143,15 +143,15 @@ if "%VER_CHOICE%"=="2" (
 
 :: --- STEP 3.5: RISK ACKNOWLEDGEMENT ---
 echo.
-echo Natsumi will now be installed. Please read the following before proceeding:
+echo Noir will now be installed. Please read the following before proceeding:
 echo.
-echo Natsumi is provided "as-is" without any warranties. By installing and using Natsumi, you agree
+echo Noir is provided "as-is" without any warranties. By installing and using Noir, you agree
 echo to the GPLv3 software license found in the LICENSE file in the repository. You are responsible for
-echo any damages or issues that may arise from using Natsumi and you agree not to hold the developers
+echo any damages or issues that may arise from using Noir and you agree not to hold the developers
 echo liable for any such damages or issues.
 echo.
-echo Additionally, Natsumi uses fx-autoconfig to apply JS scripts to your browser. If your system is
-echo infected with malware, installing Natsumi may put your browser data at higher risk of being accessed
+echo Additionally, Noir uses fx-autoconfig to apply JS scripts to your browser. If your system is
+echo infected with malware, installing Noir may put your browser data at higher risk of being accessed
 echo maliciously. Please ensure your system is secure before proceeding with installation.
 echo.
 echo If you have read the above and agree to the terms, type 'y' to continue.
@@ -170,8 +170,8 @@ echo.
 echo [STEP 4] Downloading files...
 cd /d "%TEMP_DIR%" || exit /b
 
-echo Cloning Natsumi Browser (%NATSUMI_BRANCH%)...
-git clone -b %NATSUMI_BRANCH% --depth 1 --single-branch https://github.com/greeeen-dev/natsumi-browser.git natsumi
+echo Cloning Noir Browser (%NATSUMI_BRANCH%)...
+git clone -b %NATSUMI_BRANCH% --depth 1 --single-branch https://github.com/rinne05/noir-browser.git natsumi
 if %errorlevel% neq 0 ( 
     echo [ERROR] Git Clone failed. Check if branch '%NATSUMI_BRANCH%' exists and you've installed Git.
     pause 
@@ -205,14 +205,18 @@ if exist "%CHROME_DIR%\userContent.css" (
 )
 
 :: Clean Natsumi Folder
+if exist "%CHROME_DIR%\noir" (
+    echo    [CLEAN] Removing old 'noir' system folder...
+    rd /s /q "%CHROME_DIR%\noir"
+)
 if exist "%CHROME_DIR%\natsumi" (
-    echo    [CLEAN] Removing old 'natsumi' system folder...
+    echo    [CLEAN] Removing legacy 'natsumi' folder...
     rd /s /q "%CHROME_DIR%\natsumi"
 )
 
 :: --- NATSUMI FILES ---
 echo    [COPY] Installing 'natsumi' folder...
-xcopy /E /I /Y /Q "%TEMP_DIR%\natsumi\natsumi" "%CHROME_DIR%\natsumi" >nul
+xcopy /E /I /Y /Q "%TEMP_DIR%\natsumi\noir" "%CHROME_DIR%\noir" >nul
 
 echo    [COPY] Installing 'userChrome.css'...
 copy /y "%TEMP_DIR%\natsumi\userChrome.css" "%CHROME_DIR%\" >nul
@@ -220,11 +224,11 @@ copy /y "%TEMP_DIR%\natsumi\userChrome.css" "%CHROME_DIR%\" >nul
 echo    [COPY] Installing 'userContent.css'...
 copy /y "%TEMP_DIR%\natsumi\userContent.css" "%CHROME_DIR%\" >nul
 
-if exist "%TEMP_DIR%\natsumi\natsumi-config.css" (
-    echo    [COPY] Installing 'natsumi-config.css'...
-    copy /y "%TEMP_DIR%\natsumi\natsumi-config.css" "%CHROME_DIR%\" >nul
+if exist "%TEMP_DIR%\natsumi\noir-config.css" (
+    echo    [COPY] Installing 'noir-config.css'...
+    copy /y "%TEMP_DIR%\natsumi\noir-config.css" "%CHROME_DIR%\" >nul
 ) else (
-    echo    [WARN] 'natsumi-config.css' not found in download. Skipping.
+    echo    [WARN] 'noir-config.css' not found in download. Skipping.
 )
 
 :: --- FX-AUTOCONFIG FILES ---
@@ -261,11 +265,11 @@ echo.
 echo [INFO] Generating chrome.manifest in utils...
 (
 echo content userchromejs ./
-echo content userscripts ../natsumi/scripts/
+echo content userscripts ../noir/scripts/
 echo skin userstyles classic/1.0 ../CSS/
 echo content userchrome ../resources/
-echo content natsumi ../natsumi/
-echo content natsumi-icons ../natsumi/icons/
+echo content natsumi ../noir/
+echo content natsumi-icons ../noir/icons/
 ) > "%CHROME_DIR%\utils\chrome.manifest"
 
 
@@ -281,7 +285,7 @@ echo set "SELECTION=%SELECTION%"
 echo set "PROFILE_ROOT_PATH=%PROFILE_ROOT_PATH%"
 echo set "EXE_NAME=%EXE_NAME%"
 echo set "BROWSER_NAME=%BROWSER_NAME%"
-) > "%TEMP%\natsumi_state.cmd"
+) > "%TEMP%\noir_state.cmd"
 
 :: Admin Check
 net session >nul 2>&1
@@ -345,7 +349,7 @@ if %errorlevel% neq 0 (
 :: --- FINISH ---
 cd /d "%USERPROFILE%"
 rd /s /q "%TEMP_DIR%"
-if exist "%TEMP%\natsumi_state.cmd" del /q "%TEMP%\natsumi_state.cmd"
+if exist "%TEMP%\noir_state.cmd" del /q "%TEMP%\noir_state.cmd"
 echo.
 echo ==================================================
 echo            INSTALLATION COMPLETE

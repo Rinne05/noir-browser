@@ -120,7 +120,7 @@ class NatsumiWelcome {
                 </div>
                 <div id="natsumi-corner-icon">
                     <image id="natsumi-corner-icon-image"></image>
-                    <div id="natsumi-corner-icon-label">Natsumi Browser</div>
+                    <div id="natsumi-corner-icon-label">Noir Browser</div>
                 </div>
                 <div id="natsumi-skip-button">
                     <div id="natsumi-skip-label">Skip setup</div>
@@ -135,7 +135,7 @@ class NatsumiWelcome {
             <div id="natsumi-welcome-drumroll-complete" class="natsumi-welcome-drumroll">
                 <div class="natsumi-welcome-drumroll-icon"></div>
                 <div class="natsumi-welcome-drumroll-text">
-                    Welcome to Natsumi
+                    Welcome to Noir
                 </div>
             </div>
         `)
@@ -257,7 +257,7 @@ class NatsumiWelcome {
             paneNode = convertToXUL(`
                 <div id="natsumi-welcome-complete" class="natsumi-welcome-pane">
                     <div id="natsumi-welcome-title">Ready to browse?</div>
-                    <div class="natsumi-welcome-paragraph">Natsumi is ready to rock and roll. Have fun browsing!</div>
+                    <div class="natsumi-welcome-paragraph">Noir is ready to rock and roll. Have fun browsing!</div>
                     <div class="natsumi-welcome-kawaii"></div>
                 </div>
             `);
@@ -336,7 +336,7 @@ class NatsumiWelcome {
         const uiState = UIState.get();
         if (uiState.status === UIState.STATUS_SIGNED_IN && uiState.displayName) {
             const drumrollCompleteText = this.node.querySelector("#natsumi-welcome-drumroll-complete .natsumi-welcome-drumroll-text");
-            drumrollCompleteText.textContent = `Welcome to Natsumi, ${uiState.displayName}`
+            drumrollCompleteText.textContent = `Welcome to Noir, ${uiState.displayName}`
         }
 
         setTimeout(() => {
@@ -357,8 +357,8 @@ class NatsumiWelcome {
 
             // Add to notifications
             let notificationObject = new NatsumiNotification(
-                "Welcome to Natsumi!",
-                "You can always customize Natsumi to your likings in the preferences page.",
+                "Welcome to Noir!",
+                "You can always customize Noir to your likings in the preferences page.",
                 "chrome://natsumi/content/icons/lucide/party.svg",
                 10000
             )
@@ -434,7 +434,7 @@ class NatsumiDefaultStartupAnimation extends NatsumiBaseStartupAnimation {
             ["stay hydrated!!!1", null],
             ["quotes? in my browser???", null],
             ["Eat ice cream for a huge buff.", "@therealconfused"],
-            ["Natsumi is your browser mod. Good choice.", null]
+            ["Noir is your browser mod. Good choice.", null]
         ]
 
         // Pick a random quote
@@ -534,7 +534,7 @@ class NatsumiXPStartupAnimation extends NatsumiBaseStartupAnimation {
 
         let text1 = document.createElement("div");
         text1.id = "natsumi-startup-xp-text-1";
-        text1.textContent = "Natsumi";
+        text1.textContent = "Noir";
         xpTextContainer.appendChild(text1);
 
         let text2 = document.createElement("div");
@@ -682,7 +682,7 @@ function createColorsPane() {
         "Select your accent color",
         `
             <div class="natsumi-welcome-paragraph">
-                The accent color will be used throughout Natsumi. You can use your Firefox theme's colors if you want, too.
+                The accent color will be used throughout Noir. You can use your Firefox theme's colors if you want, too.
             </div>
             <div class="natsumi-welcome-selection-container">
                 ${colorsSelection}
@@ -1044,27 +1044,27 @@ function createCompatibilityWarning() {
     try {
         if (isUnsupported) {
             let warningBodyNode = document.getElementById("natsumi-compat-warning-body-1");
-            warningBodyNode.textContent = `Natsumi is incompatible with ${displayBrowserName}. This can be due to compatibility issues or severe concerns such as security/privacy or ethics.`;
+            warningBodyNode.textContent = `Noir is incompatible with ${displayBrowserName}. This can be due to compatibility issues or severe concerns such as security/privacy or ethics.`;
             let warningBodyNode2 = document.getElementById("natsumi-compat-warning-body-2");
-            warningBodyNode2.textContent = `Please use a supported browser or uninstall Natsumi.`;
+            warningBodyNode2.textContent = `Please use a supported browser or uninstall Noir.`;
             let warningRestartNode = document.getElementById("natsumi-compat-warning-restart");
             warningRestartNode.style.display = "none";
         } else if (isOutdated) {
             let warningHeaderNode = document.getElementById("natsumi-compat-warning-header");
             warningHeaderNode.textContent = "Your browser is outdated";
             let warningBodyNode = document.getElementById("natsumi-compat-warning-body-1");
-            warningBodyNode.textContent = `You're currently on Firefox ${browserVersion}. Natsumi requires Firefox ${requiredFirefox}.`;
+            warningBodyNode.textContent = `You're currently on Firefox ${browserVersion}. Noir requires Firefox ${requiredFirefox}.`;
             let warningBodyNode2 = document.getElementById("natsumi-compat-warning-body-2");
-            warningBodyNode2.textContent = "Please update your browser or uninstall Natsumi.";
+            warningBodyNode2.textContent = "Please update your browser or uninstall Noir.";
             let warningRestartNode = document.getElementById("natsumi-compat-warning-restart");
             warningRestartNode.style.display = "none";
         } else if (isTorSecurityIssue) {
             let warningHeaderNode = document.getElementById("natsumi-compat-warning-header");
-            warningHeaderNode.textContent = `Using Natsumi on ${displayBrowserName} is not recommended`;
+            warningHeaderNode.textContent = `Using Noir on ${displayBrowserName} is not recommended`;
             let warningBodyNode = document.getElementById("natsumi-compat-warning-body-1");
-            warningBodyNode.textContent = `The Tor Project recommends against installing plugins onto Tor Browser, which ${displayBrowserName} is based on. You can continue to use Natsumi with this browser, but you acknowledge the risks of doing so.`;
+            warningBodyNode.textContent = `The Tor Project recommends against installing plugins onto Tor Browser, which ${displayBrowserName} is based on. You can continue to use Noir with this browser, but you acknowledge the risks of doing so.`;
             let warningBodyNode2 = document.getElementById("natsumi-compat-warning-body-2");
-            warningBodyNode2.textContent = "Natsumi is provided \"as is\" without warranty of any kind. You assume all responsibility for issues caused by using Natsumi with this browser. The Natsumi Browser project is not affiliated with Tor Project in any way.";
+            warningBodyNode2.textContent = "Noir is provided \"as is\" without warranty of any kind. You assume all responsibility for issues caused by using Noir with this browser. The Noir Browser project is not affiliated with Tor Project in any way.";
             let warningRestartNode = document.getElementById("natsumi-compat-warning-restart");
             warningRestartNode.addEventListener("click", () => {
                 ucApi.Prefs.set("natsumi.browser.ignore-security-notice", true);
@@ -1184,7 +1184,7 @@ function setupInitialConfig() {
                     <div id="natsumi-init-config-header">
                         Configuring your browser
                     </div>
-                    <div id="natsumi-init-config-body-1">We're configuring your browser to get Natsumi set up and working.</div>
+                    <div id="natsumi-init-config-body-1">We're configuring your browser to get Noir set up and working.</div>
                     <div id="natsumi-init-config-body-2">Your browser will restart automatically once ready.</div>
                 </div>
             </div>

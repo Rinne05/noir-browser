@@ -32,7 +32,7 @@ Removing or modifying parts of this file may break some parts of Natsumi.
 */
 
 /* Setup (config and global modules) */
-@import "../natsumi-config.css";
+@import "../noir-config.css";
 @import "modules/preload.css";
 @import "global/colors.css";
 @import "global/starlight.css";

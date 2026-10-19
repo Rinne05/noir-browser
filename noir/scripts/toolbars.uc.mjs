@@ -583,7 +583,7 @@ class NatsumiStatusBarHandler {
 
         let notificationObject = new NatsumiNotification(
             "Your toolbar got an upgrade!",
-            "Your status bar items were moved to the new Natsumi Bottom Toolbar, so your status bar is free for more!",
+            "Your status bar items were moved to the new Noir Bottom Toolbar, so your status bar is free for more!",
             "chrome://natsumi/content/icons/lucide/sparkle.svg",
             10000
         );

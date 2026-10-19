@@ -32,6 +32,7 @@ SOFTWARE.
 */
 
 import * as ucApi from "chrome://userchromejs/content/uc_api.sys.mjs";
+import {t, localizeDom} from "./i18n.sys.mjs";
 import {NatsumiNotification} from "./notifications.sys.mjs";
 import {FileUpload} from "./files.sys.mjs";
 import {
@@ -1166,10 +1167,10 @@ class SelectPreference extends MultipleChoicePreference {
 function addToSidebarLegacy() {
     // FF150 and below
     let customizeNodeString = `
-        <richlistitem id="natsumi-settings" class="category" value="paneNatsumiSettings" data-l10n-id="category-natsumi-settings" data-l10n-attrs="tooltiptext" align="center" tooltiptext="Customize Natsumi">
+        <richlistitem id="natsumi-settings" class="category" value="paneNatsumiSettings" data-l10n-id="category-natsumi-settings" data-l10n-attrs="tooltiptext" align="center" tooltiptext="Customize Noir">
             <image class="category-icon"/>
             <label class="category-name" flex="1">
-                Customize Natsumi
+                Customize Noir
             </label>
         </richlistitem>
     `
@@ -1182,10 +1183,10 @@ function addToSidebarLegacy() {
         </richlistitem>
     `
     let aboutNodeString = `
-        <richlistitem id="natsumi-about" class="category" value="paneNatsumiAbout" data-l10n-id="category-natsumi-shortcuts" data-l10n-attrs="tooltiptext" align="center" tooltiptext="About Natsumi">
+        <richlistitem id="natsumi-about" class="category" value="paneNatsumiAbout" data-l10n-id="category-natsumi-shortcuts" data-l10n-attrs="tooltiptext" align="center" tooltiptext="About Noir">
             <image class="category-icon"/>
             <label class="category-name" flex="1">
-                About Natsumi
+                About Noir
             </label>
         </richlistitem>
     `
@@ -1217,14 +1218,14 @@ function addToSidebar() {
     // We'll clone the home settings button here instead of making our own
     let homeNode = document.getElementById("category-home");
 
-    // Create Customize Natsumi button
+    // Create Customize Noir button
     let customizeNode = homeNode.cloneNode(true);
     customizeNode.id = "natsumi-settings";
     customizeNode.setAttribute("view", "paneNatsumiSettings");
     customizeNode.setAttribute("iconsrc", "chrome://natsumi/content/icons/lucide/paintbrush.svg");
     customizeNode.setAttribute("original-icon", "chrome://natsumi/content/icons/lucide/paintbrush.svg");
     customizeNode.setAttribute("data-l10n-id", "category-natsumi-settings");
-    customizeNode.innerHTML = "Customize Natsumi";
+    customizeNode.innerHTML = "Customize Noir";
 
     // Create Keyboard Shortcuts button
     let shortcutsNode = homeNode.cloneNode(true);
@@ -1235,14 +1236,14 @@ function addToSidebar() {
     shortcutsNode.setAttribute("data-l10n-id", "category-natsumi-shortcuts");
     shortcutsNode.innerHTML = "Keyboard Shortcuts";
 
-    // Create About Natsumi button
+    // Create About Noir button
     let aboutNode = homeNode.cloneNode(true);
     aboutNode.id = "natsumi-about";
     aboutNode.setAttribute("view", "paneNatsumiAbout");
     aboutNode.setAttribute("iconsrc", "chrome://natsumi/content/icons/lucide/info.svg");
     aboutNode.setAttribute("original-icon", "chrome://natsumi/content/icons/lucide/info.svg");
     aboutNode.setAttribute("data-l10n-id", "category-natsumi-about");
-    aboutNode.innerHTML = "About Natsumi";
+    aboutNode.innerHTML = "About Noir";
 
     // Set icon if needed
     let iconPack = "";
@@ -1651,7 +1652,7 @@ function addColorsPane() {
         "natsumi.theme.force-actual-theme-color",
         "natsumiThemeColorNormalized",
         "Normalize Firefox theme accent color",
-        "This will keep saturation and brightness consistent with other Natsumi accent colors.",
+        "This will keep saturation and brightness consistent with other Noir accent colors.",
         true,
         false,
         "natsumi.theme.force-natsumi-color",
@@ -2482,7 +2483,7 @@ function addMiniplayerBehaviorPane() {
     let miniplayerBehaviorGroup = new OptionsGroup(
         "natsumiMiniplayerBehavior",
         "Behavior",
-        "Tweak how you want Natsumi's Miniplayer to behave."
+        "Tweak how you want Noir's Miniplayer to behave."
     );
 
     miniplayerBehaviorGroup.registerOption("natsumiMiniplayerToggle", new CheckboxChoice(
@@ -2584,7 +2585,7 @@ function addPipBehaviorPane() {
     let pipBehaviorGroup = new OptionsGroup(
         "natsumiPipBehavior",
         "Behavior",
-        "Tweak how you want Natsumi's Picture-in-Picture window to behave."
+        "Tweak how you want Noir's Picture-in-Picture window to behave."
     );
 
     pipBehaviorGroup.registerOption("natsumiPipScrollToMove", new CheckboxChoice(
@@ -2688,7 +2689,7 @@ function addURLbarLayoutPane() {
         "natsumiURLbarLayout",
         "natsumi.urlbar.do-not-float",
         "Layout",
-        "Choose the layout to use for Natsumi's URL bar when opened."
+        "Choose the layout to use for Noir's URL bar when opened."
     );
 
     for (let urlbarLayout in urlbarLayouts) {
@@ -2696,6 +2697,20 @@ function addURLbarLayoutPane() {
     }
 
     let layoutNode = layoutSelection.generateNode();
+
+    let imeNotice = convertToXUL(`
+        <div id="natsumiURLbarImeNotice" class="natsumi-settings-info">
+            <div class="natsumi-settings-info-icon"></div>
+            <div class="natsumi-settings-info-text">
+                Noir enables Firefox's “keep the panel open during IME composition” setting once, so
+                the floating layout works with Chinese, Japanese and Korean input. If you turn it off
+                in about:config, Noir will not enable it again, and the URL bar will fall back to the
+                toolbar while composing.
+            </div>
+        </div>
+    `);
+    let layoutChooser = layoutNode.querySelector(".natsumi-mc-chooser");
+    layoutChooser.parentNode.insertBefore(imeNotice, layoutChooser);
 
     addToGroupbox(layoutNode, "natsumiURLBar");
 }
@@ -2705,7 +2720,7 @@ function addURLbarBehaviorPane() {
     let behaviorGroup = new OptionsGroup(
         "natsumiURLBarBehavior",
         "Behavior",
-        "Tweak how you want Natsumi's URL bar to behave."
+        "Tweak how you want Noir's URL bar to behave."
     );
 
     behaviorGroup.registerOption("natsumiURLbarAlwaysExpanded", new CheckboxChoice(
@@ -2834,7 +2849,7 @@ function addMiscPreferencesPane() {
         "natsumi.theme.classic-preferences",
         "natsumiMiscPreferencesRevert",
         "Revert to classic preferences look",
-        "If you don't like Natsumi's custom preferences design, you can enable this to disable it."
+        "If you don't like Noir's custom preferences design, you can enable this to disable it."
     ));
 
     miscPreferencesGroup.registerOption("natsumiMiscPreferencesHideSubcategory", new CheckboxChoice(
@@ -3016,7 +3031,7 @@ function addMiscInteractionsPane() {
         "natsumi.browser.invert-scroll",
         "natsumiMiscInvertedScroll",
         "Invert scroll direction",
-        "This will invert the scroll direction for some Natsumi features. This does NOT affect web content."
+        "This will invert the scroll direction for some Noir features. This does NOT affect web content."
     ));
 
     let miscInteractionsNode = miscInteractionsGroup.generateNode();
@@ -3032,7 +3047,7 @@ function addPreferencesPanes() {
         let appearanceNode = convertToXUL(`
             <hbox id="natsumiCustomizeHeader" class="subcategory natsumi-category-header" data-category="paneNatsumiSettings" hidden="true">
                 <html:div class="natsumi-category-icon" style="background-image: url('chrome://natsumi/content/icons/lucide/paintbrush.svg')"></html:div>
-                <html:${categoryHeader}>Customize Natsumi</html:${categoryHeader}>
+                <html:${categoryHeader}>Customize Noir</html:${categoryHeader}>
             </hbox>
         `);
         prefsView.insertBefore(appearanceNode, homePane);
@@ -3129,7 +3144,7 @@ function addPreferencesPanes() {
         addGroupbox(
             "natsumiPDFViewer",
             "PDF Viewer",
-            "Natsumi gives your browser's PDF viewer a redesign for a more modern and organized feel.",
+            "Noir gives your browser's PDF viewer a redesign for a more modern and organized feel.",
             "chrome://natsumi/content/icons/lucide/page.svg"
         );
         addPDFMaterialPane();
@@ -3265,6 +3280,12 @@ try {
     addPreferencesPanes();
     addHideFloorpWarnings();
     goodGirlBoyEnby();
+
+// Localize our own preferences UI (Chinese translations; English falls through)
+for (let localizeRoot of document.querySelectorAll('[data-category^="paneNatsumi"], [id^="natsumi"]')) {
+    localizeDom(localizeRoot);
+}
+
 } catch(e) {
     console.error(e);
 }

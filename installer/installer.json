@@ -1,11 +1,11 @@
 {
   "package": {
-    "name": "Natsumi Browser",
-    "author": "Green (@greeeen-dev)",
+    "name": "Noir Browser",
+    "author": "rinne05",
     "version": "6.12.4",
     "version_rc": null,
     "version_beta": null,
     "version_alpha": null,
-    "source": "https://github.com/greeeen-dev/natsumi-browser"
+    "source": "https://github.com/rinne05/noir-browser"
   }
 }

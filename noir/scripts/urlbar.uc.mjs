@@ -88,36 +88,33 @@ class NatsumiURLBarController {
         `;
         searchmodeSwitcher.shadowRoot.appendChild(searchmodeSwitcherInline);
 
-        this.urlbarMutationObserver = new MutationObserver((mutations) => {
-            mutations.forEach(() => {
-                // Check if open attribute exists
-                if (this.urlBarNode.hasAttribute("open") && !this.wasSelected && !this.wasOpened) {
-                    this.selectUrlbarContents();
+        this.urlbarMutationObserver = new MutationObserver(() => {
+            if (this.urlBarNode.hasAttribute("open") && !this.wasSelected && !this.wasOpened) {
+                this.selectUrlbarContents();
+            }
+
+            // Set open status to shadow root
+            let searchmodeSwitcherButton = searchmodeSwitcher.shadowRoot.querySelector("#main-button");
+            if (this.urlBarNode.hasAttribute("open")) {
+                searchmodeSwitcherButton.setAttribute("natsumi-open", "true");
+            } else {
+                searchmodeSwitcherButton.removeAttribute("natsumi-open");
+            }
+
+            let shouldReset = this.wasOpened;
+
+            this.wasOpened = this.urlBarNode.hasAttribute("open");
+            this.wasSelected = this.urlBarNode.hasAttribute("usertyping");
+            this.wasOpenInNewTab = this.urlBarNode.openLinkAsNewTab;
+
+            if (!this.wasOpened && shouldReset) {
+                if (this.urlBarNode.openLinkAsNewTab) {
+                    this.urlBarNode.openLinkAsNewTab = false;
+                    this.urlBarObject.inputField.value = gBrowser.selectedBrowser.browsingContext.currentURI.spec;
                 }
 
-                // Set open status to shadow root
-                let searchmodeSwitcherButton = searchmodeSwitcher.shadowRoot.querySelector("#main-button");
-                if (this.urlBarNode.hasAttribute("open")) {
-                    searchmodeSwitcherButton.setAttribute("natsumi-open", "true");
-                } else {
-                    searchmodeSwitcherButton.removeAttribute("natsumi-open");
-                }
-
-                let shouldReset = this.wasOpened;
-
-                this.wasOpened = this.urlBarNode.hasAttribute("open");
-                this.wasSelected = this.urlBarNode.hasAttribute("usertyping");
-                this.wasOpenInNewTab = this.urlBarNode.openLinkAsNewTab;
-
-                if (!this.wasOpened && shouldReset) {
-                    if (this.urlBarNode.openLinkAsNewTab) {
-                        this.urlBarNode.openLinkAsNewTab = false;
-                        this.urlBarObject.inputField.value = gBrowser.selectedBrowser.browsingContext.currentURI.spec;
-                    }
-
-                    ucApi.Prefs.set("browser.urlbar.openintab", this.originalConfig);
-                }
-            });
+                ucApi.Prefs.set("browser.urlbar.openintab", this.originalConfig);
+            }
         });
 
         // Observe the URL bar for changes

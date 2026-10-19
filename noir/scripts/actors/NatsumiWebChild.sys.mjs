@@ -44,7 +44,7 @@ export class NatsumiWebChild extends JSWindowActorChild {
 
                     // Set fully installed status
                     installTest.classList.add("natsumi-full-install");
-                    installTestText.textContent = "Natsumi is installed";
+                    installTestText.textContent = "Noir is installed";
                     installTestDescription.textContent = "You're already using Natsumi. Nice work!";
                 } catch(e) {
                     this.consoleLog(e);

@@ -32,6 +32,7 @@ SOFTWARE.
 */
 
 import * as ucApi from "chrome://userchromejs/content/uc_api.sys.mjs";
+import {t, localizeDom} from "./i18n.sys.mjs";
 
 let version;
 let branch;
@@ -98,7 +99,7 @@ function checkForUpdates() {
 
     updaterContainer.removeAttribute("natsumi-update-failed");
     updaterContainer.setAttribute("natsumi-update-checking", "");
-    updaterStatus.textContent = "Checking for updates...";
+    updaterStatus.textContent = t("Checking for updates...");
 
     // Induce artificial delay then check for updates
     // This is so that the updater doesn't look like it's broken
@@ -108,18 +109,18 @@ function checkForUpdates() {
 
             if (!data.available) {
                 hasUpdate = false;
-                updaterStatus.textContent = "You're up to date!";
+                updaterStatus.textContent = t("You're up to date!");
                 return;
             }
 
             hasUpdate = true;
             updaterContainer.setAttribute("natsumi-update-available", "");
-            updaterButton.textContent = `Update to ${data.data["version"]}`;
+            updaterButton.textContent = `${t("Update to")} ${data.data["version"]}`;
         }).catch((e) => {
             console.error("Failed to check for updates:", e);
             updaterContainer.removeAttribute("natsumi-update-checking");
             updaterContainer.setAttribute("natsumi-update-failed", "");
-            updaterStatus.textContent = "Update check failed."
+            updaterStatus.textContent = t("Update check failed.")
         });
     }, 100);
 }
@@ -131,9 +132,9 @@ function setUpdaterUnavailable(catastrophic = false) {
     updaterContainer.setAttribute("natsumi-update-disabled", "");
 
     if (catastrophic) {
-        updaterStatus.textContent = "Updater is unavailable";
+        updaterStatus.textContent = t("Updater is unavailable");
     } else {
-        updaterStatus.textContent = "Updates are disabled or externally managed";
+        updaterStatus.textContent = t("Updates are disabled or externally managed");
     }
 }
 
@@ -161,20 +162,20 @@ function addAboutPane() {
         browserVersion = AppConstants.GLIDE_FIREFOX_VERSION;
     }
 
-    let natsumiName = "Natsumi Browser";
+    let natsumiName = "Noir Browser";
     if (isStardust) {
-        natsumiName = "Natsumi Stardust";
+        natsumiName = "Noir Stardust";
     }
 
     let nodeString = `
         <hbox id="natsumiAboutCategory" class="subcategory" data-category="paneNatsumiAbout" hidden="true">
-            <html:${categoryHeader}>About Natsumi</html:${categoryHeader}>
+            <html:${categoryHeader}>About Noir</html:${categoryHeader}>
         </hbox>
         <groupbox id="natsumiAboutExperimentalWarning" data-category="paneNatsumiAbout" hidden="true">
             <div class="natsumi-settings-info warning">
                 <div class="natsumi-settings-info-icon"></div>
                 <div class="natsumi-settings-info-text">
-                    You're on an experimental version of Natsumi. Don't panic, and stay safe!
+                    You're on an experimental version of Noir. Don't panic, and stay safe!
                 </div>
             </div>
         </groupbox>
@@ -183,13 +184,13 @@ function addAboutPane() {
                 <div class="natsumi-settings-info-icon"></div>
                 <div class="natsumi-settings-info-text">
                     <html:strong>The Tor Project recommends against installing plugins onto Tor Browser, which your
-                    browser is based on.</html:strong> You can continue to use Natsumi with this browser, but you
+                    browser is based on.</html:strong> You can continue to use Noir with this browser, but you
                     acknowledge the risks of doing so.<html:br/>
                     <html:br/>
-                    Natsumi is provided "as is" without warranty of any kind. We will not assume any responsibility for
-                    privacy or security issues caused by using Natsumi with Tor Browser, if any.<html:br/>
+                    Noir is provided "as is" without warranty of any kind. We will not assume any responsibility for
+                    privacy or security issues caused by using Noir with Tor Browser, if any.<html:br/>
                     <html:br/>
-                    The Natsumi Browser project is not affiliated with Tor Project in any way.
+                    The Noir Browser project is not affiliated with Tor Project in any way.
                 </div>
             </div>
         </groupbox>
@@ -215,7 +216,7 @@ function addAboutPane() {
                 </div>
                 <div class="natsumi-about-vertical-separator"></div>
                 <div id="natsumi-about-links-container">
-                    <html:a href="https://github.com/greeeen-dev/natsumi-browser" class="natsumi-about-link">Source code</html:a>
+                    <html:a href="https://github.com/rinne05/noir-browser" class="natsumi-about-link">Source code</html:a>
                     <html:a href="https://natsumi.greeeen.dev" class="natsumi-about-link">Website</html:a>
                     <html:a href="https://natsumi.greeeen.dev/discord" class="natsumi-about-link">Discord</html:a>
                 </div>
@@ -230,13 +231,13 @@ function addAboutPane() {
     nameNode.textContent = natsumiName;
 
     let versionNode = document.getElementById("natsumi-about-version");
-    versionNode.textContent = `Version ${version} (${codename})`;
+    versionNode.textContent = `${t("Version")} ${version} (${codename})`;
 
     let browserVersionNode = document.getElementById("natsumi-about-browser-version");
     if (forkedFox) {
-        browserVersionNode.textContent = `Running on ${browserName} ${forkedVersion} (Firefox ${browserVersion})`;
+        browserVersionNode.textContent = `${t("Running on")} ${browserName} ${forkedVersion} (Firefox ${browserVersion})`;
     } else {
-        browserVersionNode.textContent = `Running on Firefox ${browserVersion}`;
+        browserVersionNode.textContent = `${t("Running on")} Firefox ${browserVersion}`;
     }
 
     let stabilityBadge = document.getElementById("natsumi-about-stability-badge");
@@ -294,6 +295,12 @@ fetch(versionPath).then(response => response.json()).then(data => {
     codename = data.codename;
     addToSidebar();
     addAboutPane();
+
+// Localize our own preferences UI (Chinese translations; English falls through)
+for (let localizeRoot of document.querySelectorAll('[data-category^="paneNatsumi"], [id^="natsumi"]')) {
+    localizeDom(localizeRoot);
+}
+    
 }).catch(error => {
     console.error("Failed to fetch Natsumi version:", error);
     version = "Unknown";

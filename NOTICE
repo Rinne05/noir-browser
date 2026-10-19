@@ -1,0 +1,39 @@
+NOTICE
+======
+
+Noir Browser is a personal fork of Natsumi Browser.
+
+Original work
+-------------
+
+  Natsumi Browser
+  Copyright (c) 2024-present Green (@greeeen-dev)
+  https://github.com/greeeen-dev/natsumi-browser
+  Licensed under the GNU General Public License v3.0 (see LICENSE).
+
+Modifications
+-------------
+
+  Copyright (c) 2026 rinne05
+  Licensed under the GNU General Public License v3.0 (see LICENSE).
+
+  This repository contains modifications to the original work, including a
+  rebrand, a folder/file rename (natsumi/ -> noir/), installer and uninstaller
+  work, self-hosted update manifests, Chinese preferences translations and
+  bug fixes. See the git history for the date of each change.
+
+Per-file notices
+----------------
+
+  Upstream files keep their original headers, including MIT-style permission
+  notices. Those notices are compatible with the GPLv3 and are retained as
+  attribution. Files added for this fork are licensed under the GPLv3.
+
+Third-party components
+----------------------
+
+  - fx-autoconfig (MPL-2.0) - privileged JS loader, fetched/copied by the
+    installer from https://github.com/greeeen-dev/fx-autoconfig
+  - Lucide icons (ISC) - see noir/icons/lucide/LICENSE
+  - Microsoft Fluent UI icons (MIT) - see noir/icons/fluent/LICENSE
+  - Borealis sound theme (GPLv3) - see the README credits

@@ -179,16 +179,16 @@ class NatsumiPostloadManager {
         let restartButton = document.getElementById("natsumi-css-warning-restart");
 
         if (isCatastrophic && isReallyCatastrophic) {
-            warningBody.textContent = "Your browser could not load Natsumi's CSS properly. A lot of things (possibly everything) may not work as expected.";
-            warningBody2.textContent = "Please check if Natsumi has been installed correctly.";
+            warningBody.textContent = "Your browser could not load Noir's CSS properly. A lot of things (possibly everything) may not work as expected.";
+            warningBody2.textContent = "Please check if Noir has been installed correctly.";
         } else if (isCatastrophic && !isReallyCatastrophic) {
             warningIcon.setAttribute("restart", "");
-            warningHeader.textContent = "Restart to use Natsumi";
-            warningBody.textContent = "Your browser had custom CSS disabled, so Natsumi enabled it automatically.";
-            warningBody2.textContent = "Please restart your browser to use Natsumi.";
+            warningHeader.textContent = "Restart to use Noir";
+            warningBody.textContent = "Your browser had custom CSS disabled, so Noir enabled it automatically.";
+            warningBody2.textContent = "Please restart your browser to use Noir.";
         } else {
-            warningBody.textContent = "Natsumi's CSS seems to have loaded but doesn't seem to have completed loading. You can ignore this warning, but some things may not work as expected.";
-            warningBody2.textContent = "Please check if Natsumi has been installed correctly.";
+            warningBody.textContent = "Noir's CSS seems to have loaded but doesn't seem to have completed loading. You can ignore this warning, but some things may not work as expected.";
+            warningBody2.textContent = "Please check if Noir has been installed correctly.";
         }
 
         if (recursiveBrowser) {

@@ -1,6 +1,6 @@
 # Security Policy
 Please report all security-related issues through
-[here](https://github.com/greeeen-dev/natsumi-browser/security/advisories/new).
+[here](https://github.com/rinne05/noir-browser/security/advisories/new).
 
 ## Supported Versions
 If a version is unsupported, security advisories for those versions will

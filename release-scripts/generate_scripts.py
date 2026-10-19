@@ -6,7 +6,7 @@ from pathlib import Path
 # -------------------------
 # Configuration
 # -------------------------
-scripts = ["natsumi/scripts/*"]
+scripts = ["noir/scripts/*"]
 json_path = Path("theme.json")  # relative to current working directory
 allowed_extensions = (".uc.js", ".uc.mjs", ".sys.mjs")
 

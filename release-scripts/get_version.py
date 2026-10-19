@@ -28,7 +28,7 @@ SOFTWARE.
 import json
 import os
 
-with open('natsumi/version.json', 'r') as file:
+with open('noir/version.json', 'r') as file:
     data = json.load(file)
 
 raw_version = data['version']

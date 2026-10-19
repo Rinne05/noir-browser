@@ -2,3 +2,4 @@
 .env
 /.installer
 /images/source/*
+__pycache__/

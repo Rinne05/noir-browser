@@ -43,6 +43,16 @@ function makeCatNoisesAndDoSomeVeryCuteInitialSetupBecauseIFeltVeryCuteWhenWriti
     // Ensure icons work on Firefox
     ucApi.Prefs.set("svg.context-properties.content.enabled", true);
 
+    // Keep the URL bar results panel open during IME composition. Without this,
+    // Firefox closes the panel mid-composition, #urlbar loses its [open]
+    // attribute and the floating URL bar collapses back to the toolbar (CJK
+    // input bug). Only set it once so the user can still override it in
+    // about:config later.
+    let imeCompositionPref = ucApi.Prefs.get("browser.urlbar.keepPanelOpenDuringImeComposition");
+    if (!imeCompositionPref.hasUserValue()) {
+        imeCompositionPref.setTo(true);
+    }
+
     // Ensure translucency works on macOS and Windows
     let isMac = Services.appinfo.OS.toLowerCase() === "darwin";
     let isWindows = Services.appinfo.OS.toLowerCase() === "winnt";

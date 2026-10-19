@@ -34,9 +34,9 @@ import {NatsumiNotification} from "./notifications.sys.mjs";
 
 const chromePath = PathUtils.join(PathUtils.profileDir, "chrome");
 const natsumiDownloadPath = PathUtils.join(PathUtils.profileDir, "natsumi-updater-downloads");
-const natsumiPath = PathUtils.join(chromePath, "natsumi");
-const natsumiOldPath = PathUtils.join(chromePath, "natsumi-old");
-const natsumiNewPath = PathUtils.join(chromePath, "natsumi-new");
+const natsumiPath = PathUtils.join(chromePath, "noir");
+const natsumiOldPath = PathUtils.join(chromePath, "noir-old");
+const natsumiNewPath = PathUtils.join(chromePath, "noir-new");
 
 function convertToXUL(node) {
     // noinspection JSUnresolvedReference
@@ -63,7 +63,7 @@ class NatsumiUpdater {
         this.lastUpdated = 0;
         this.lastAvailableUpdate = null;
         this.successfulUpdateCheck = false;
-        this.updateUrl = "https://natsumi-updates.greeeen.dev"
+        this.updateUrl = "https://raw.githubusercontent.com/rinne05/noir-browser/main/updates"
         this.keepOldVersions = false;
 
         if (ucApi.Prefs.get("natsumi.updater.last-update").exists()) {
@@ -152,7 +152,7 @@ class NatsumiUpdater {
             if (updateData.available) {
                 let notificationObject = new NatsumiNotification(
                     "Update available",
-                    `Natsumi ${updateData.data["version"]} is available to install.`,
+                    `Noir ${updateData.data["version"]} is available to install.`,
                     "chrome://natsumi/content/icons/lucide/update.svg",
                     10000
                 );
@@ -209,7 +209,7 @@ class NatsumiUpdater {
         zipReader.open(zipFile);
 
         // Extract file
-        let entries = zipReader.findEntries(`natsumi-browser-*/natsumi/*`);
+        let entries = zipReader.findEntries(`noir-browser-*/noir/*`);
 
         for (let entryName of entries) {
             const entry = zipReader.getEntry(entryName);
@@ -249,7 +249,7 @@ class NatsumiUpdater {
         let versionHash = updateData["hash"];
 
         // Download zip file
-        await this.downloadZip(`https://github.com/greeeen-dev/natsumi-browser/archive/refs/tags/${versionTag}.zip`, "update.zip", versionHash)
+        await this.downloadZip(`https://github.com/rinne05/noir-browser/archive/refs/tags/${versionTag}.zip`, "update.zip", versionHash)
 
         // Extract zip file
         await this.extractZip("update.zip");
@@ -311,7 +311,7 @@ class NatsumiUpdater {
                 <div id="natsumi-updater-content">
                     <image id="natsumi-updater-icon"></image>
                     <div id="natsumi-updater-header">
-                        Updating Natsumi
+                        Updating Noir
                     </div>
                     <div id="natsumi-updater-body-1">Once the update's done, your browser will restart automatically.</div>
                     <div id="natsumi-updater-body-2">Preparing update</div>

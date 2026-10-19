@@ -46,40 +46,40 @@ jobs:
           include-data-files: "installer/installer.json=installer.json"
       - name: Rename (Linux)
         if: ${{ matrix.os == 'ubuntu-latest' }}
-        run: mv build/installer.bin build/natsumi-installer-linux
+        run: mv build/installer.bin build/noir-installer-linux
       - name: Rename (macOS)
         if: ${{ matrix.os == 'macos-latest' }}
         run:
-          mv build/installer.bin build/natsumi-installer-macos-arm64;
-          mv build_intel/installer.bin build_intel/natsumi-installer-macos-intel
+          mv build/installer.bin build/noir-installer-macos-arm64;
+          mv build_intel/installer.bin build_intel/noir-installer-macos-intel
       - name: Rename (Windows)
         if: ${{ matrix.os == 'windows-latest' }}
-        run: Rename-Item -Path installer/windows-installer.bat -NewName natsumi-installer.bat
+        run: Rename-Item -Path installer/windows-installer.bat -NewName noir-installer.bat
       - name: Upload package (macOS arm64)
         uses: actions/upload-artifact@v7
         if: ${{ matrix.os == 'macos-latest' }}
         with:
-          name: natsumi-installer-macos-arm64
-          path: build/natsumi-installer-macos-arm64
+          name: noir-installer-macos-arm64
+          path: build/noir-installer-macos-arm64
           retention-days: 7
       - name: Upload package (macOS Intel)
         uses: actions/upload-artifact@v7
         if: ${{ matrix.os == 'macos-latest' }}
         with:
-          name: natsumi-installer-macos-x64
-          path: build_intel/natsumi-installer-macos-intel
+          name: noir-installer-macos-x64
+          path: build_intel/noir-installer-macos-intel
           retention-days: 7
       - name: Upload package (Linux)
         uses: actions/upload-artifact@v7
         if: ${{ matrix.os == 'ubuntu-latest' }}
         with:
-          name: natsumi-installer-linux
-          path: build/natsumi-installer-linux
+          name: noir-installer-linux
+          path: build/noir-installer-linux
           retention-days: 7
       - name: Upload package (PowerShell)
         uses: actions/upload-artifact@v7
         if: ${{ matrix.os == 'windows-latest' }}
         with:
-          name: natsumi-installer-windows
-          path: installer/natsumi-installer.bat
+          name: noir-installer-windows
+          path: installer/noir-installer.bat
           retention-days: 7

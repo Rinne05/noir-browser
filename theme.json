@@ -1,14 +1,14 @@
 {
-  "id": "natsumi-browser",
-  "homepage": "https://github.com/greeeen-dev/natsumi-browser",
-  "author": "greeeen-dev",
-  "name": "Natsumi Browser",
+  "id": "noir-browser",
+  "homepage": "https://github.com/rinne05/noir-browser",
+  "author": "rinne05",
+  "name": "Noir Browser",
   "description": "Welcome to your personal internet.",
   "version": "6.12.4",
   "createdAt": "2024-12-06T10:19:47Z",
   "ai": "no",
-  "readme": "https://raw.githubusercontent.com/greeeen-dev/natsumi-browser/main/README.md",
-  "image": "https://github.com/greeeen-dev/natsumi-browser/raw/main/images/natsumi-preview.webp",
+  "readme": "https://raw.githubusercontent.com/rinne05/noir-browser/main/README.md",
+  "image": "https://github.com/rinne05/noir-browser/raw/main/images/natsumi-preview.webp",
   "style": {
     "chrome": "userChrome.css",
     "content": "userContent.css"
@@ -26,7 +26,7 @@
     "librewolf"
   ],
   "scripts": {
-    "natsumi/scripts/": {
+    "noir/scripts/": {
       "preferences.uc.mjs": {
         "loadOrder": 10,
         "include": [
@@ -164,6 +164,8 @@
       },
       "files.sys.mjs": {},
       "version.sys.mjs": {},
+      "i18n.sys.mjs": {},
+      "i18n-zh.sys.mjs": {},
       "fonts.uc.mjs": {
         "include": [
           "chrome://browser/content/browser.xhtml",
@@ -173,6 +175,7 @@
         ]
       },
       "reset-tab-style.sys.mjs": {},
+      "robots.uc.mjs": {},
       "floorp-tab-style.uc.mjs": {
         "loadOrder": 11,
         "include": [

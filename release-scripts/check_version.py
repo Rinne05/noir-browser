@@ -32,7 +32,7 @@ branch = sys.argv[-1]
 
 print("Detected branch:", branch)
 
-with open('natsumi/version.json', 'r') as file:
+with open('noir/version.json', 'r') as file:
     package_version = json.load(file)['version']
 with open('installer/installer.json', 'r') as file:
     installer_data = json.load(file)["package"]
@@ -56,7 +56,7 @@ else:
     print("Version mismatch, cannot build!")
 
 # Print version info
-print(f"- Package version (natsumi/version.json): {package_version}")
+print(f"- Package version (noir/version.json): {package_version}")
 print(f"- Installer versions (installer/installer.json): {'/'.join(installer_versions)}")
 print(f"- Sine version (theme.json): {sine_version}")
 
