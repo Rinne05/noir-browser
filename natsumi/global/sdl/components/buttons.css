@@ -1,0 +1,13 @@
+* {
+  /* SDL button colors */
+  --natsumi-button-hover-color: rgba(0, 0, 0, 0.1);
+  --natsumi-button-active-color: var(--natsumi-colors-secondary);
+  --natsumi-button-active-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+  --natsumi-button-hover-color-dark: rgba(255, 255, 255, 0.1);
+  --natsumi-button-active-color-dark: color-mix(in srgb, var(--natsumi-primary-color) 70%, black);
+
+  @media (prefers-color-scheme: dark) {
+    --natsumi-button-hover-color: rgba(255, 255, 255, 0.1);
+    --natsumi-button-active-color: color-mix(in srgb, var(--natsumi-primary-color) 70%, black);
+  }
+}

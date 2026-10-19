@@ -1,0 +1,257 @@
+/*
+
+Natsumi Browser - Welcome to your personal internet.
+
+Copyright (c) 2024-present Green (@greeeen-dev)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+/* ==== Tabs design (Natsumi Blade) ==== */
+/* Natsumi Blade is a modern and sleek tab design that adapts to context. */
+
+@keyframes backdrop-fadein {
+  from {
+    backdrop-filter: saturate(1) contrast(1);
+  }
+
+  to {
+    backdrop-filter: var(--natsumi-mat-hz-backdrop);
+  }
+}
+
+/* Base Natsumi design (Blade) */
+@media not -moz-pref("natsumi.tabs.use-custom-type") {
+  #tabbrowser-arrowscrollbox {
+    /*noinspection CssInvalidFunction*/
+    .tabbrowser-tab {
+      --natsumi-tab-highlight-color: var(--natsumi-primary-color);
+      --natsumi-tab-idle-width: 0;
+      --natsumi-tab-idle-opacity: 0;
+
+      @media (prefers-color-scheme: dark) {
+        --natsumi-tab-highlight-color: color-mix(in srgb, var(--natsumi-primary-color) 70%, black);
+
+        @media -moz-pref("natsumi.tabs.blade-legacy-color") {
+          --natsumi-tab-highlight-color: var(--natsumi-colors-primary);
+        }
+      }
+
+      &[usercontextid] {
+        --natsumi-tab-highlight-color: var(--identity-icon-color);
+        --natsumi-tab-idle-width: 40%;
+        --natsumi-tab-idle-opacity: 1;
+      }
+
+      @media -moz-pref("sidebar.verticalTabs") {
+        padding: 0 !important;
+
+        .tab-group-line {
+          display: none !important;
+        }
+      }
+
+      @media not -moz-pref("sidebar.verticalTabs") {
+        .tab-group-line {
+          margin-bottom: calc(var(--tab-block-margin, 2px) * -1);
+        }
+      }
+
+      .tab-loading-burst[bursting]::before {
+        fill: light-dark(var(--natsumi-colors-primary), var(--natsumi-primary-color)) !important;
+      }
+
+      .tab-text {
+        font-size: calc(1rem + 1px + var(--natsumi-font-offset, 0px));
+
+        @media -moz-pref("natsumi.tabs.absolute-font-size") {
+          font-size: calc(12px + var(--natsumi-font-offset, 0px));
+        }
+      }
+
+      .tab-stack {
+        transition: scale 0.2s ease;
+      }
+
+      &:active:not([style*="transform"]):not(:has(.tab-close-button:active), :has(.tab-audio-button:active)) .tab-stack {
+        scale: 0.95 !important;
+      }
+
+      &:has(.tab-close-button:hover) {
+        transition: opacity 0.2s ease !important;
+        --natsumi-tab-highlight-color: rgb(255, 100, 100);
+      }
+
+      & > .tab-stack > .tab-background {
+        transition: background-color 0.2s ease, backdrop-filter 0.2s ease !important;
+        overflow: visible !important;
+        border-radius: var(--natsumi-tab-border-radius) !important;
+        outline: none !important;
+        display: grid;
+        grid-template-columns: 1fr;
+        backdrop-filter: saturate(1) contrast(1);
+        border: none !important;
+
+        .tab-context-line {
+          display: none !important;
+        }
+
+        .tab-loading-burst, .tab-group-line {
+          grid-row-start: 1;
+          grid-column-start: 1;
+        }
+
+        &::after {
+          content: "";
+          grid-row-start: 1;
+          grid-column-start: 1;
+          width: var(--natsumi-tab-idle-width);
+          height: calc(100% - 4px);
+          opacity: var(--natsumi-tab-idle-opacity);
+          border: 2px solid var(--natsumi-tab-highlight-color) !important;
+          background: color-mix(in srgb, var(--natsumi-tab-highlight-color) 40%, transparent);
+          border-radius: calc(var(--natsumi-tab-border-radius) - 1px);
+          mask-image: linear-gradient(to right, black, transparent 30%);
+          transition: width 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border 0.2s ease;
+
+          @media -moz-pref("natsumi.theme.buggy-scaling") {
+            height: calc(100% - 3.5px);
+          }
+
+          @media -moz-pref("natsumi.browser.type-firedragon") {
+            height: 100%;
+          }
+        }
+      }
+
+      &:hover {
+        & > .tab-stack > .tab-background {
+          &::after {
+            width: calc(100% - calc(var(--tab-inner-inline-margin) * 2));
+            opacity: 1;
+          }
+        }
+      }
+
+      &[selected], &[visuallyselected], &[natsumi-glimpse-selected] {
+        /*noinspection CssInvalidFunction*/
+        & > .tab-stack > .tab-background {
+          box-shadow: 0 0 3px rgba(0, 0, 0, 0.3) !important;
+          background-image: none !important;
+          background: var(--natsumi-mat-hz-background) !important;
+          animation: backdrop-fadein 0.2s ease;
+
+          @media -moz-pref("natsumi.sidebar.blur-tab-button") {
+            animation: backdrop-with-blur-fadein 0.2s ease;
+          }
+
+          animation-fill-mode: forwards;
+
+          &::after {
+            width: calc(100% - 4px);
+            opacity: 1;
+
+            @media -moz-pref("natsumi.browser.type-firedragon") {
+              width: 100%;
+            }
+          }
+        }
+      }
+
+      &[multiselected] {
+        & > .tab-stack > .tab-background {
+          box-shadow: 0 0 2px rgba(0, 0, 0, 0.5) !important;
+
+          &::after {
+            width: 100%;
+            opacity: 1;
+          }
+        }
+      }
+
+      &:has(.tab-close-button:active) {
+        opacity: 0.5;
+      }
+    }
+  }
+
+  #tabbrowser-tabs[expanded] #tabbrowser-arrowscrollbox {
+    .tabbrowser-tab .tab-close-button {
+      border-radius: 10px !important;
+      transition: background-color 0.2s ease !important;
+
+      &:hover {
+        background-color: var(--natsumi-button-hover-color) !important;
+      }
+    }
+  }
+
+  #sidebar-main:not([sidebar-launcher-expanded]), #sidebar-container:not([sidebar-launcher-expanded]) {
+    .tabbrowser-tab {
+      min-width: var(--floorp-tab-min-height, var(--tab-min-height)) !important;
+
+      & > .tab-stack > .tab-background {
+        min-width: calc(var(--floorp-tab-min-height, var(--tab-min-height)) - 4px) !important;
+        margin: 2px auto !important;
+      }
+    }
+
+    #tabbrowser-arrowscrollbox .tabbrowser-tab {
+      & > .tab-stack > .tab-background {
+        &::after {
+          width: calc(var(--floorp-tab-min-height, var(--tab-min-height)) - 4px) !important;
+        }
+      }
+    }
+
+    tab-split-view-wrapper {
+      .tabbrowser-tab {
+        & > .tab-stack > .tab-content {
+          .tab-icon-stack {
+            margin-inline: auto !important;
+          }
+        }
+      }
+    }
+  }
+
+  #tabs-newtab-button, #vertical-tabs-newtab-button {
+    min-height: calc(max(var(--floorp-tab-min-height, 36px), 36px) - 4px) !important;
+    transition: background-color 0.2s ease;
+    border-radius: var(--natsumi-tab-border-radius) !important;
+    
+    .toolbarbutton-text {
+      font-size: calc(1rem + 1px + var(--natsumi-font-offset, 0px)) !important;
+
+      @media -moz-pref("natsumi.tabs.absolute-font-size") {
+        font-size: calc(12px + var(--natsumi-font-offset, 0px)) !important;
+      }
+    }
+    
+    .toolbarbutton-icon {
+      margin-bottom: 1px !important;
+    }
+  }
+
+  /* Ensure backdrop filters work */
+  #vertical-tabs, #TabsToolbar {
+    will-change: unset !important;
+  }
+}

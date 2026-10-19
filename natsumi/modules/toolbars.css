@@ -1,0 +1,714 @@
+/*
+
+Natsumi Browser - Welcome to your personal internet.
+
+Copyright (c) 2024-present Green (@greeeen-dev)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+/* ==== Natsumi Toolbars ==== */
+
+/* Pinned toolbar */
+#natsumi-pinned-toolbar {
+  --natsumi-toolbar-margin: calc(var(--space-small) + var(--space-xsmall));
+  --natsumi-toolbar-offset: var(--natsumi-toolbar-override, 0px);
+  --natsumi-toolbar-separation: calc(var(--natsumi-browser-separation) - 6px);
+  display: flex !important;
+  position: absolute;
+  background-color: transparent !important;
+  width: calc(var(--natsumi-sidebar-width) - calc(2 * var(--natsumi-toolbar-margin)));
+  margin-inline: var(--natsumi-toolbar-margin);
+  top: calc(5px + var(--natsumi-button-height) + var(--natsumi-top-toolbar-offset, 0px) + var(--natsumi-pinned-tabs-height) + var(--natsumi-toolbar-offset) + var(--natsumi-toolbar-separation));
+  flex-wrap: wrap;
+  gap: 5px;
+  min-height: 0 !important;
+
+  @media not -moz-pref("sidebar.verticalTabs") {
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  @media not -moz-pref("sidebar.position_start") {
+    right: 0;
+  }
+
+  @media -moz-pref("natsumi.theme.pinned-toolbar-on-top") {
+    top: calc(5px + var(--natsumi-button-height) + var(--natsumi-top-toolbar-offset, 0px) + var(--natsumi-toolbar-offset) + var(--natsumi-toolbar-separation));
+  }
+
+  & > * {
+    --toolbarbutton-padding-inner: 8px;
+  }
+
+  & > toolbarbutton, & > toolbaritem {
+    width: unset !important;
+    min-width: 36px;
+    max-width: calc(100%);
+    flex: 1 !important;
+    margin-inline: 0 !important;
+    padding-inline: 0 !important;
+  }
+
+  toolbarbutton:not(.bookmark-item):not(#PlacesChevron), #personal-bookmarks {
+    background: color-mix(in srgb, currentColor 7%, transparent) !important;
+    border-radius: var(--natsumi-tab-border-radius) !important;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+    padding-inline: 0 !important;
+
+    &:not([disabled="true"]):not(#personal-bookmarks) {
+      &:hover {
+        background: var(--tab-background-color-hover, var(--tab-hover-background-color)) !important;
+      }
+
+      &:active, &[open] {
+        background: var(--natsumi-button-active-color) !important;
+        box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+      }
+    }
+
+    &#personal-bookmarks {
+      min-width: 100% !important;
+    }
+
+    .toolbarbutton-icon, .toolbarbutton-badge-stack {
+      background: transparent !important;
+    }
+  }
+
+  #PlacesToolbarItems {
+    align-items: center;
+    padding-left: 2px;
+    min-height: 32px;
+
+    .bookmark-item {
+      max-height: 24px;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+
+      &:hover {
+        background-color: var(--natsumi-button-hover-color) !important;
+      }
+
+      &:active, &[open] {
+        background-color: var(--natsumi-button-active-color) !important;
+        box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+      }
+    }
+  }
+
+  #PlacesChevron {
+    max-width: 24px;
+    max-height: 24px;
+    margin: 4px !important;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    border-radius: var(--toolbarbutton-border-radius);
+
+    &:hover {
+      background-color: var(--natsumi-button-hover-color) !important;
+    }
+
+    &:active, &[open] {
+      background-color: var(--natsumi-button-active-color) !important;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  toolbaritem {
+    width: 100% !important;
+    max-width: 100%;
+    flex: 1 !important;
+  }
+}
+
+body[natsumi-compact-mode] #natsumi-pinned-toolbar {
+  --natsumi-top-toolbar-offset: var(--natsumi-top-toolbar-compact-offset, 0px) !important;
+
+  @media (-moz-pref("natsumi.theme.compact-style", "sidebar")) and (not -moz-pref("natsumi.theme.single-toolbar")) {
+    --natsumi-top-toolbar-offset: calc(var(--natsumi-top-toolbar-compact-offset, 0px) + 31px) !important;
+
+    @media -moz-pref("browser.nova.enabled") and -moz-pref("natsumi.theme.islands") {
+      --natsumi-top-toolbar-offset: calc(var(--natsumi-top-toolbar-compact-offset, 0px) + 39px + var(--natsumi-browser-separation)) !important;
+    }
+  }
+}
+
+body:not([natsumi-compact-mode]) #natsumi-pinned-toolbar {
+  --natsumi-toolbar-separation: 0px !important;
+}
+
+:root:not([customizing]) {
+  &:not(:has(#sidebar-container)) #vertical-pinned-tabs-splitter {
+    margin-top: calc(var(--natsumi-pinned-toolbar-height, -8px) + 8px);
+
+    @media -moz-pref("natsumi.theme.pinned-toolbar-on-top") {
+      margin-top: 0 !important;
+    }
+  }
+
+  @media not -moz-pref("natsumi.theme.pinned-toolbar-on-top") {
+    #sidebar-container {
+      --natsumi-top-toolbar-margin: calc(var(--natsumi-pinned-toolbar-height, -8px) + 8px);
+    }
+  }
+}
+
+@media -moz-pref("natsumi.theme.pinned-toolbar-on-top") {
+  :root:not([customizing]) #sidebar-container {
+    --natsumi-top-toolbar-margin: calc(var(--natsumi-pinned-toolbar-height) + 8px);
+    padding-top: calc(var(--natsumi-pinned-toolbar-height) + 8px) !important;
+  }
+
+  &:not(:has(#sidebar-container)) #pinned-tabs-container {
+    margin-top: calc(var(--natsumi-pinned-toolbar-height) + 8px) !important;
+  }
+}
+
+#sidebar-container:has(#pinned-tabs-container:empty) {
+  @media not -moz-pref("natsumi.theme.pinned-toolbar-on-top") {
+    --natsumi-top-toolbar-margin: calc(var(--natsumi-pinned-toolbar-height) + 8px);
+    padding-top: calc(var(--natsumi-pinned-toolbar-height) + 8px) !important;
+  }
+}
+
+&:has(#sidebar-main:not([sidebar-launcher-expanded]), #sidebar-container:not([sidebar-launcher-expanded])) {
+  #natsumi-pinned-toolbar {
+    flex-wrap: nowrap;
+    flex-direction: column;
+
+    & > toolbarbutton, & > toolbaritem {
+      min-width: unset !important;
+      max-width: 32px !important;
+    }
+  }
+}
+
+@media not -moz-pref("natsumi.sidebar.floorp-floating-panel") {
+  &:has(#panel-sidebar-select-box) body:not([natsumi-compact-mode]) {
+    @media -moz-pref("sidebar.position_start") {
+      &:not([natsumi-panel-sidebar-on-right]) #natsumi-pinned-toolbar {
+        left: calc(calc(var(--natsumi-browser-separation) * 2) + 36px);
+
+        @media -moz-pref("browser.nova.enabled") and -moz-pref("natsumi.theme.islands") {
+          left: calc(calc(var(--natsumi-browser-separation) * 2) + 32px);
+        }
+      }
+    }
+
+    @media not -moz-pref("sidebar.position_start") {
+      &[natsumi-panel-sidebar-on-right] #natsumi-pinned-toolbar {
+        right: calc(calc(var(--natsumi-browser-separation) * 2) + 36px);
+
+        @media -moz-pref("browser.nova.enabled") and -moz-pref("natsumi.theme.islands") {
+          right: calc(calc(var(--natsumi-browser-separation) * 2) + 32px);
+        }
+      }
+    }
+  }
+}
+
+body:has(#PersonalToolbar:not([collapsed]), #PersonalToolbar[collapsed="false"]) {
+  &:not([natsumi-compact-mode]) {
+    #natsumi-pinned-toolbar {
+      @media not -moz-pref("natsumi.theme.single-toolbar") {
+        top: calc(73px + var(--natsumi-top-toolbar-offset, 0px) + var(--natsumi-pinned-tabs-height) + var(--natsumi-toolbar-offset));
+
+        @media -moz-pref("natsumi.theme.pinned-toolbar-on-top") {
+          top: calc(73px + var(--natsumi-top-toolbar-offset, 0px) + var(--natsumi-toolbar-offset));
+        }
+      }
+    }
+  }
+}
+
+@media not -moz-pref("natsumi.theme.single-toolbar") {
+  @media -moz-pref("sidebar.verticalTabs") and (-moz-pref("natsumi.sidebar.top-toolbar")) and (not -moz-pref("natsumi.theme.islands")) {
+    &:not(:has(#sidebar-container[sidebar-launcher-expanded], #sidebar-main[sidebar-launcher-expanded])) {
+      #natsumi-pinned-toolbar {
+        --natsumi-top-toolbar-offset: var(--natsumi-top-toolbar-height);
+      }
+    }
+  }
+}
+
+/* Top toolbar */
+#natsumi-top-toolbar-container {
+  --natsumi-toolbar-margin: calc(var(--space-small) + var(--space-xsmall));
+  display: flex;
+  width: var(--natsumi-sidebar-width);
+  height: 40px;
+  position: absolute;
+
+  #natsumi-top-toolbar {
+    width: -moz-available;
+  }
+
+  @media not -moz-pref("sidebar.position_start") {
+    right: 0;
+  }
+}
+
+@media not -moz-pref("natsumi.sidebar.top-toolbar") {
+  #natsumi-top-toolbar-container {
+    display: none !important;
+  }
+}
+
+@media -moz-pref("sidebar.verticalTabs") and (-moz-pref("natsumi.sidebar.top-toolbar")) and (not -moz-pref("natsumi.theme.islands")) and (not -moz-pref("natsumi.theme.single-toolbar")) {
+  body:not([natsumi-compact-mode]) {
+    #natsumi-top-toolbar {
+      & > toolbarbutton, & > toolbaritem {
+        &:not(#urlbar-container):not(#PanelUI-menu-button):not(#workspaces-toolbar-button) {
+          padding-inline: 4px !important;
+
+          &:first-child {
+            padding-left: 8px !important;
+          }
+        }
+      }
+    }
+  }
+
+  body[natsumi-compact-mode] {
+    #natsumi-top-toolbar-container {
+      --natsumi-toolbar-height: 40px;
+      width: calc(var(--natsumi-sidebar-width) - calc(var(--natsumi-browser-separation) * 2));
+      top: 0;
+
+      .titlebar-buttonbox {
+        margin-inline: 4px !important;
+      }
+    }
+
+    &[natsumi-compact-navbar-hover], &[natsumi-compact-navbar-extend],
+    &:has(#navigator-toolbox.fullscreen-with-menubar),
+    &:has(#navigator-toolbox.fullscreen-floating-toolbox),
+    &:has(#navigator-toolbox toolbarbutton[open], #urlbar[focused]) {
+      #natsumi-top-toolbar-container {
+        top: var(--natsumi-toolbar-height);
+      }
+
+      &:has(#PersonalToolbar:not([collapsed])) {
+        --natsumi-toolbar-height: 68px;
+      }
+    }
+
+    #natsumi-tabs-clearer, #vertical-tabs, #tabbrowser-tabs, #natsumi-workspace-indicator, #natsumi-pinned-toolbar {
+      --natsumi-top-toolbar-offset: var(--natsumi-top-toolbar-height);
+      --natsumi-top-toolbar-compact-offset: var(--natsumi-top-toolbar-height);
+    }
+
+    &:has(#sidebar-container[sidebar-launcher-expanded], #sidebar-main[sidebar-launcher-expanded]) {
+      #natsumi-tabs-clearer, #vertical-tabs, #tabbrowser-tabs, #natsumi-workspace-indicator, #natsumi-pinned-toolbar {
+        --natsumi-top-toolbar-compact-offset: 28px;
+      }
+    }
+  }
+}
+
+@media not -moz-pref("natsumi.theme.single-toolbar") {
+  @media (not -moz-pref("sidebar.verticalTabs")) or (not -moz-pref("natsumi.sidebar.top-toolbar")) or (-moz-pref("natsumi.theme.islands")) {
+    #natsumi-top-toolbar-container {
+      display: none !important;
+    }
+  }
+
+  @media -moz-pref("sidebar.verticalTabs") and (-moz-pref("natsumi.sidebar.top-toolbar")) and (not -moz-pref("natsumi.theme.islands")) {
+    &:has(#sidebar-container[sidebar-launcher-expanded], #sidebar-main[sidebar-launcher-expanded]) {
+      @media -moz-pref("sidebar.position_start") {
+        #nav-bar {
+          .titlebar-buttonbox-container {
+            display: none !important;
+          }
+        }
+      }
+
+      @media not -moz-pref("sidebar.position_start") {
+        #natsumi-top-toolbar-container {
+          .titlebar-buttonbox-container {
+            display: none !important;
+          }
+        }
+      }
+
+      body:not([natsumi-compact-mode]) {
+        #nav-bar {
+          @media -moz-pref("sidebar.position_start") {
+            margin-left: var(--natsumi-sidebar-width);
+          }
+
+          @media not -moz-pref("sidebar.position_start") {
+            margin-right: var(--natsumi-sidebar-width);
+          }
+        }
+
+        #nav-bar-customization-target, #PanelUI-button {
+          & > toolbarbutton, & > toolbaritem {
+            &:not(#urlbar-container):not(#PanelUI-menu-button):not(#workspaces-toolbar-button) {
+              padding-inline: 4px !important;
+
+              &:first-child {
+                padding-left: 4px !important;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    &:not(:has(#sidebar-container[sidebar-launcher-expanded], #sidebar-main[sidebar-launcher-expanded])) {
+      #natsumi-top-toolbar-container {
+        width: 32px !important;
+        height: fit-content !important;
+        margin-inline: var(--natsumi-toolbar-margin);
+        top: 40px;
+
+        .titlebar-buttonbox-container {
+          display: none !important;
+        }
+
+        #natsumi-top-toolbar {
+          flex-direction: column !important;
+          margin-inline: auto;
+
+          & > toolbarbutton, & > toolbaritem {
+            &:not(#urlbar-container):not(#PanelUI-menu-button):not(#workspaces-toolbar-button) {
+              &:first-child {
+                padding-left: 4px !important;
+              }
+            }
+          }
+        }
+      }
+
+      body:not([natsumi-compact-mode]) {
+        #sidebar-container, #sidebar-main {
+          margin-top: var(--natsumi-top-toolbar-height) !important;
+        }
+      }
+
+      body[natsumi-compact-mode] {
+        #natsumi-top-toolbar-container {
+          width: 36px !important;
+          top: var(--natsumi-browser-separation) !important;
+        }
+      }
+
+      &:has(#PersonalToolbar:not([collapsed])) #natsumi-top-toolbar-container {
+        top: 68px;
+      }
+    }
+  }
+}
+
+@media -moz-pref("natsumi.theme.single-toolbar") and -moz-pref("natsumi.sidebar.top-toolbar") {
+  :root:not([customizing]) {
+    #natsumi-top-toolbar-container {
+      top: 2px;
+      left: calc(var(--natsumi-sidebar-width) - var(--urlbar-margin-inline) - 36px);
+
+      #natsumi-top-toolbar {
+        z-index: 2;
+        width: fit-content !important;
+        height: 28px !important;
+        border-radius: 12px;
+        border: var(--natsumi-mat-sd-border) !important;
+        padding-block: 3px !important;
+        padding-inline: 36px 0 !important;
+        box-sizing: content-box;
+        background: var(--natsumi-mat-sd-background) !important;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+
+        & > * {
+          transition: margin-left 0.2s ease;
+          margin-left: -36px !important;
+        }
+      }
+    }
+
+    &:has(#nav-bar:hover) #natsumi-top-toolbar, #natsumi-top-toolbar-container #natsumi-top-toolbar:hover,
+    #natsumi-top-toolbar-container #natsumi-top-toolbar:has(toolbarbutton[open]) {
+      z-index: 2;
+      width: fit-content !important;
+      height: 28px !important;
+      border-radius: 12px;
+      border: var(--natsumi-mat-sd-border) !important;
+      padding-block: 3px !important;
+      padding-inline: 36px 0 !important;
+      box-sizing: content-box;
+      background: var(--natsumi-mat-sd-background) !important;
+      opacity: 1;
+      pointer-events: unset;
+
+      & > * {
+        margin-left: 0 !important;
+      }
+    }
+
+    &:has(#nav-bar:hover, #natsumi-top-toolbar:hover, #natsumi-top-toolbar toolbarbutton[open]) {
+      #PersonalToolbar {
+        pointer-events: none;
+      }
+    }
+  }
+}
+
+/* Bottom toolbar */
+#natsumi-bottom-toolbar {
+  display: flex !important;
+  justify-content: space-between !important;
+  flex-wrap: wrap;
+  position: absolute;
+  bottom: calc(var(--natsumi-browser-separation) + var(--space-small) + 40px);
+  width: calc(var(--natsumi-sidebar-width) - calc(var(--natsumi-browser-separation) * 2)) !important;
+  background: transparent !important;
+  border: none !important;
+  min-height: 28px !important;
+  bottom: var(--natsumi-browser-separation) !important;
+
+  @media -moz-pref("natsumi.sidebar.autohide-bottom-toolbar") {
+    min-height: 0 !important;
+  }
+
+  #workspaces-toolbar-button {
+    margin: 0 4px !important;
+  }
+
+  @media -moz-pref("sidebar.position_start") {
+    left: var(--natsumi-browser-separation);
+  }
+
+  @media not -moz-pref("sidebar.position_start") {
+    right: var(--natsumi-browser-separation);
+  }
+
+  @media -moz-pref("natsumi.sidebar.disable-bottom-toolbar") {
+    display: none !important;
+  }
+}
+
+@media -moz-pref("natsumi.browser.type", "floorp") or -moz-pref("natsumi.browser.type", "waterfox") {
+  &:not(:has(#nora-statusbar.hidden, #nora-statusbar[style*="display:none"], #nora-statusbar[style*="display: none"], #status-bar[collapsed])) {
+    body:not([natsumi-compact-mode]) #natsumi-bottom-toolbar {
+      bottom: calc(var(--natsumi-browser-separation) + 28px) !important;
+    }
+
+    @media -moz-pref("browser.nova.enabled") and -moz-pref("natsumi.theme.islands") {
+      body:not([natsumi-compact-mode]) #natsumi-bottom-toolbar {
+        bottom: calc(calc(var(--natsumi-browser-separation) * 2) + 30px) !important;
+      }
+    }
+
+    @media (-moz-pref("natsumi.theme.compact-style", "toolbar")) and (not -moz-pref("natsumi.theme.single-toolbar")) {
+      #natsumi-bottom-toolbar {
+        bottom: calc(var(--natsumi-browser-separation) + 28px) !important;
+      }
+
+      @media -moz-pref("browser.nova.enabled") and -moz-pref("natsumi.theme.islands") {
+        #natsumi-bottom-toolbar {
+          bottom: calc(calc(var(--natsumi-browser-separation) * 2) + 30px) !important;
+        }
+      }
+    }
+  }
+}
+
+body:not([natsumi-compact-mode]):has(sidebar-main:not([expanded])) #natsumi-bottom-toolbar {
+  left: 7px;
+
+  @media (not -moz-pref("sidebar.verticalTabs")) and -moz-pref("browser.nova.enabled") {
+    left: 2px;
+
+    @media -moz-pref("natsumi.theme.islands") {
+      left: 4px;
+    }
+  }
+}
+
+:root[uidensity="compact"] {
+  body:not([natsumi-compact-mode]):has(sidebar-main:not([expanded])) #natsumi-bottom-toolbar {
+    left: 2px;
+  }
+}
+
+@media not -moz-pref("natsumi.sidebar.floorp-floating-panel") {
+  &:has(#panel-sidebar-select-box) body:not([natsumi-panel-sidebar-on-right]) #natsumi-bottom-toolbar {
+    left: calc(calc(var(--natsumi-browser-separation) * 3) + 36px);
+  }
+
+  @media -moz-pref("browser.nova.enabled") and -moz-pref("natsumi.theme.islands") {
+    &:has(#panel-sidebar-select-box) body:not([natsumi-panel-sidebar-on-right]):not([natsumi-compact-mode]) #natsumi-bottom-toolbar {
+      left: calc(calc(var(--natsumi-browser-separation) * 2) + 38px);
+    }
+
+    @media (-moz-pref("natsumi.theme.compact-style", "toolbar")) and (not -moz-pref("natsumi.theme.single-toolbar")) {
+      &:has(#panel-sidebar-select-box) body:not([natsumi-panel-sidebar-on-right])[natsumi-compact-mode] #natsumi-bottom-toolbar {
+        left: calc(calc(var(--natsumi-browser-separation) * 2) + 38px);
+      }
+    }
+  }
+}
+
+&:has(#sidebar-main[hidden], #sidebar-container[hidden]) #natsumi-bottom-toolbar {
+  display: none !important;
+}
+
+&:has(sidebar-main:not([expanded])) #natsumi-bottom-toolbar {
+  flex-direction: column !important;
+  bottom: calc(var(--natsumi-sidebar-options-height) + var(--space-small) + var(--natsumi-browser-separation));
+  width: 36px !important;
+
+  toolbarbutton {
+    margin-block: 3px !important;
+  }
+
+  .toolbarbutton-text {
+    display: none !important;
+  }
+
+  @media not -moz-pref("natsumi.sidebar.disable-bottom-toolbar") {
+    bottom: var(--natsumi-browser-separation) !important;
+  }
+
+  @media not -moz-pref("sidebar.verticalTabs") {
+    bottom: 48px !important;
+  }
+
+  @media -moz-pref("natsumi.sidebar.workspaces-as-icons") {
+    #workspaces-toolbar-button {
+      flex-direction: column !important;
+      flex: 1 !important;
+      max-height: unset !important;
+
+      .natsumi-workspace-icon {
+        min-height: 16px !important;
+
+        &::before {
+          bottom: 50% !important;
+          left: -6px !important;
+          translate: 0 50% !important;
+        }
+      }
+    }
+  }
+}
+
+:root:not([customizing]) body[natsumi-append-installed] #sidebar-container, #sidebar-main {
+  &:not([natsumi-bottom-toolbar-empty]) {
+    #vertical-tabs {
+      @media not -moz-pref("natsumi.sidebar.disable-bottom-toolbar") {
+        padding-bottom: calc(var(--natsumi-bottom-toolbar-height, 28px) + 6px + var(--natsumi-browser-separation)) !important;
+      }
+    }
+  }
+
+  &:has(#natsumi-miniplayer-container[hide-margin])[natsumi-bottom-toolbar-empty] {
+    #tabbrowser-tabs::after {
+      display: none !important;
+    }
+
+    #vertical-tabs {
+      padding-bottom: var(--natsumi-browser-separation) !important;
+    }
+  }
+}
+
+#tabbrowser-tabs::after {
+  border-bottom: var(--tabstrip-inner-border) !important;
+}
+
+&:not(:has(#sidebar-container)) #vertical-tabs {
+  #tabbrowser-tabs {
+    padding-top: calc(var(--natsumi-single-toolbar-offset, 0px) + var(--natsumi-top-toolbar-compact-offset, 0px)) !important;
+  }
+
+  &:has(#pinned-tabs-container[dragActive]) {
+    padding-top: calc(var(--natsumi-single-toolbar-offset, 0px) + var(--natsumi-top-toolbar-compact-offset, 0px)) !important;
+
+    #tabbrowser-tabs {
+      padding-top: 0 !important;
+    }
+  }
+}
+
+:root:not([customizing]) {
+  @media -moz-pref("natsumi.theme.pinned-toolbar-on-top") {
+    #sidebar-container {
+      padding-top: calc(var(--natsumi-single-toolbar-offset, 0px) + var(--natsumi-top-toolbar-margin, 0px) + var(--natsumi-top-toolbar-compact-offset, 0px)) !important;
+    }
+  }
+
+  @media not -moz-pref("natsumi.theme.pinned-toolbar-on-top") {
+    #vertical-pinned-tabs-splitter {
+      margin-top: calc(var(--natsumi-pinned-toolbar-height, -8px) + 8px);
+    }
+
+    &:has(#vertical-pinned-tabs-splitter[hidden]) {
+      #natsumi-workspace-indicator {
+        margin-top: calc(var(--natsumi-pinned-toolbar-height, -8px) + 8px) !important;
+      }
+
+      &:not(:has(#natsumi-workspace-indicator)) {
+        #natsumi-tabs-clearer {
+          margin-top: calc(var(--natsumi-pinned-toolbar-height, -8px) + 8px) !important;
+        }
+
+        @media -moz-pref("natsumi.sidebar.hide-clear-tabs") or -moz-pref("natsumi.sidebar.clear-merge-with-workspaces") {
+          #sidebar-container {
+            padding-top: calc(var(--natsumi-single-toolbar-offset, 0px) + var(--natsumi-top-toolbar-margin, 0px) + var(--natsumi-top-toolbar-compact-offset, 0px)) !important;
+          }
+        }
+      }
+    }
+  }
+
+  #natsumi-pinned-toolbar {
+    @media -moz-pref("natsumi.theme.single-toolbar") {
+      top: calc(86px + var(--natsumi-pinned-tabs-height) + var(--natsumi-toolbar-offset) + var(--natsumi-toolbar-separation));
+
+      @media -moz-pref("natsumi.theme.pinned-toolbar-on-top") {
+        top: calc(86px + var(--natsumi-toolbar-offset) + var(--natsumi-toolbar-separation));
+      }
+    }
+  }
+}
+
+:root[customizing] {
+  * {
+    --natsumi-pinned-toolbar-default: 32px;
+  }
+
+  #natsumi-pinned-toolbar {
+    min-height: 32px !important;
+    border: light-dark(black, white) 1px dashed !important;
+  }
+
+  #natsumi-bottom-toolbar {
+    min-height: 28px !important;
+    border: light-dark(black, white) 1px dashed !important;
+  }
+
+  &:has(#sidebar-main:not([sidebar-launcher-expanded]), #sidebar-container:not([sidebar-launcher-expanded])) {
+    #natsumi-pinned-toolbar, #natsumi-bottom-toolbar {
+      min-width: 32px !important;
+    }
+  }
+}

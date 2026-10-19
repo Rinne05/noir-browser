@@ -1,0 +1,148 @@
+/*
+
+Natsumi Browser - Welcome to your personal internet.
+
+Copyright (c) 2024-present Green (@greeeen-dev)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+/* ==== Tabs design (Hexagonal) ==== */
+/* Hexagonal is a tab design inspired by Floorp's hexagonal branding. */
+
+@media -moz-pref("natsumi.tabs.use-custom-type") and -moz-pref("natsumi.tabs.type", "hexagonal") {
+  #tabbrowser-arrowscrollbox {
+    .tabbrowser-tab {
+      --natsumi-tab-height: max(calc(var(--floorp-tab-min-height, var(--tab-min-height)) - 4px), 32px);
+      --natsumi-tab-highlight-color: color-mix(in srgb, var(--natsumi-primary-color) 30%, transparent);
+      --horizontal-dist: calc(calc(var(--natsumi-tab-height) / 2) * tan(30deg));
+      --hexagon-side-length: calc(calc(var(--natsumi-tab-height) / 2) / sin(60deg));
+      --icon-container-width: calc(var(--horizontal-dist) * 2 + var(--hexagon-side-length));
+
+      &[usercontextid] {
+        --natsumi-tab-highlight-color: color-mix(in srgb, var(--identity-icon-color) 30%, transparent);
+
+        .tab-icon-stack {
+          background-color: var(--natsumi-tab-highlight-color);
+        }
+
+        .tab-context-line {
+          display: none;
+        }
+      }
+
+      padding-block: 0 !important;
+
+      & > .tab-stack {
+        .tab-icon-stack {
+          width: var(--icon-container-width) !important;
+          height: var(--natsumi-tab-height) !important;
+          margin-right: 5px !important;
+          clip-path: polygon(
+            0 50%,
+            var(--horizontal-dist) 0,
+            calc(100% - var(--horizontal-dist)) 0,
+            100% 50%,
+            calc(100% - var(--horizontal-dist)) 100%,
+            var(--horizontal-dist) 100%
+          );
+
+          .tab-icon-image {
+            margin: auto !important;
+          }
+        }
+
+        .tab-content {
+          padding-left: var(--tab-inner-inline-margin) !important;
+          padding-right: calc(var(--tab-inline-padding) + 5px) !important;
+
+          @media not -moz-pref("sidebar.verticalTabs") {
+            padding-left: 0 !important;
+          }
+        }
+
+        & > .tab-background {
+          box-shadow: none !important;
+          height: var(--natsumi-tab-height) !important;
+
+          @media -moz-pref("browser.nova.enabled") {
+            border-radius: 0 !important;
+            border: none !important;
+            background-image: none !important;
+          }
+        }
+      }
+
+      &[selected], &[visuallyselected], &:hover, &[natsumi-glimpse-selected] {
+        & > .tab-stack {
+          & > .tab-background {
+            background: light-dark(rgb(255, 255, 255), rgba(106, 106, 120, 0.7)) !important;
+            clip-path: polygon(
+                    0 50%,
+                    var(--horizontal-dist) 0,
+                    calc(100% - var(--horizontal-dist)) 0,
+                    100% 50%,
+                    calc(100% - var(--horizontal-dist)) 100%,
+                    var(--horizontal-dist) 100%
+            );
+          }
+        }
+      }
+
+      &[selected], &[visuallyselected], &[natsumi-glimpse-selected] {
+        & > .tab-stack {
+          filter: drop-shadow(0 0 2px rgba(50, 50, 0, 0.5));
+        }
+
+        .tab-icon-stack {
+          background-color: var(--natsumi-tab-highlight-color);
+        }
+      }
+    }
+
+    tab-split-view-wrapper {
+      .tabbrowser-tab {
+        & > .tab-stack > .tab-content {
+          padding-left: 0 !important;
+        }
+      }
+    }
+  }
+
+  #tabbrowser-tabs[orient="horizontal"] {
+    #tabbrowser-arrowscrollbox {
+      .tabbrowser-tab {
+        min-width: 90px !important;
+      }
+    }
+  }
+
+  #pinned-tabs-container {
+    .tabbrowser-tab {
+      &[natsumi-glimpse-selected] {
+        & > .tab-stack > .tab-background {
+          background: light-dark(rgb(255, 255, 255), rgba(106, 106, 120, 0.7)) !important;
+          box-shadow: var(--tab-selected-shadow);
+          outline-color: var(--tab-selected-outline-color);
+        }
+      }
+    }
+  }
+}

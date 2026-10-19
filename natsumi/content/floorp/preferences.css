@@ -1,0 +1,66 @@
+/*
+
+Natsumi Browser - Welcome to your personal internet.
+
+Copyright (c) 2024-present Green (@greeeen-dev)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+/* ==== Floorp Preferences tweaks ==== */
+
+@-moz-document url-prefix(about:settings), url-prefix(about:preferences) {
+  @media -moz-pref("natsumi.browser.type", "floorp") {
+    @media -moz-pref("floorp.keyboardshortcut.enabled") {
+      #natsumiKBSFloorpWarning:not([hidden]) {
+        display: flex !important;
+      }
+
+      .natsumi-shortcut-row.native-shortcut {
+        display: none;
+      }
+
+      /* Hide categories that only have native shortcuts */
+      #natsumiKBSNavigationGroup, #natsumiKBSEditingGroup, #natsumiKBSSearchGroup,
+      #natsumiKBSWindowsTabsGroup, #natsumiKBSHistoryGroup, #natsumiKBSBookmarksGroup,
+      #natsumiKBSToolsGroup, #natsumiKBSDevtoolsGroup {
+        display: none;
+      }
+    }
+
+    #natsumi-hide-floorp-warnings {
+      padding: 10px 15px;
+      margin-bottom: 10px;
+      width: fit-content;
+      border-radius: 6px;
+      background-color: light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.1));
+
+      &:hover {
+        background-color: light-dark(rgba(0, 0, 0, 0.2), rgba(255, 255, 255, 0.2));
+      }
+    }
+
+    @media -moz-pref("natsumi.theme.floorp-hide-preferences-warnings") {
+      #natsumi-hide-floorp-warnings, #floorp-hub-warning, #floorp-start-warning {
+        display: none !important;
+      }
+    }
+  }
+}

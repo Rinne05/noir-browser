@@ -1,0 +1,281 @@
+/*
+
+Natsumi Browser - Welcome to your personal internet.
+
+Copyright (c) 2024-present Green (@greeeen-dev)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+/* ==== Tabs design (Bubble) ==== */
+/* Bubble is a tab design which adds the visuals of Natsumi SDL2 to tabs. */
+
+@media -moz-pref("natsumi.tabs.use-custom-type") and -moz-pref("natsumi.tabs.type", "bubble") {
+  #tabbrowser-arrowscrollbox {
+    .tabbrowser-tab {
+      min-height: 40px !important;
+      padding: 0 !important;
+      margin-block: 2px !important;
+
+      & > .tab-stack > .tab-background {
+        margin-block: 0 !important;
+        border-radius: 20px !important;
+
+        .tab-context-line {
+          display: none !important;
+        }
+
+        @media -moz-pref("sidebar.verticalTabs") {
+          .tab-group-line {
+            display: none !important;
+          }
+        }
+
+        @media not -moz-pref("sidebar.verticalTabs") {
+          .tab-group-line {
+            left: 0 !important;
+            margin-bottom: -2px;
+          }
+        }
+
+        @media -moz-pref("browser.nova.enabled") {
+          background: none !important;
+        }
+      }
+
+      & > .tab-stack > .tab-content {
+        &::before {
+          content: "";
+          position: absolute;
+          width: calc(100% - calc(var(--tab-inner-inline-margin) * 2) - 8px);
+          left: calc(var(--tab-inner-inline-margin) + 4px);
+          height: 32px;
+          border-radius: 16px;
+          background-color: var(--natsumi-sdl2-haze-button-idle-color);
+          box-shadow: var(--natsumi-sdl2-haze-button-idle-shadow);
+          z-index: -1;
+          opacity: 0;
+        }
+      }
+
+      &:hover {
+        & > .tab-stack > .tab-content {
+          &::before {
+            opacity: 1;
+            width: calc(100% - calc(var(--tab-inner-inline-margin) * 2) - 44px);
+          }
+        }
+      }
+
+      &[usercontextid] {
+        & > .tab-stack > .tab-content {
+          --natsumi-sdl2-haze-button-context-color: var(--identity-icon-color);
+
+          &::before {
+            opacity: 1;
+          }
+        }
+      }
+
+      &[selected], &[visuallyselected], &[natsumi-glimpse-selected] {
+        & > .tab-stack > .tab-background {
+          box-shadow: 0 0 3px rgba(0, 0, 0, 0.3) !important;
+          border: var(--natsumi-mat-hz-border) !important;
+          background: var(--natsumi-mat-hz-background) !important;
+          backdrop-filter: var(--natsumi-mat-hz-backdrop) !important;
+        }
+
+        @media not -moz-pref("sidebar.verticalTabs") {
+          .tab-group-line {
+            margin-left: -4px !important;
+            min-width: calc(100% + 8px) !important;
+            margin-bottom: -4px !important;
+          }
+        }
+
+        & > .tab-stack > .tab-content {
+          &::before {
+            opacity: 1;
+            width: calc(100% - calc(var(--tab-inner-inline-margin) * 2) - 44px) !important;
+          }
+        }
+      }
+    }
+
+    tab-group[collapsed] .tabbrowser-tab:not([selected]) {
+      min-height: 0 !important;
+      margin-block: 0 !important;
+    }
+  }
+
+  #tabbrowser-tabs[expanded], #tabbrowser-tabs[orient="horizontal"] {
+    #tabbrowser-arrowscrollbox {
+      .tabbrowser-tab {
+        & > .tab-stack > .tab-content {
+          & > .tab-close-button {
+            --natsumi-tab-close-button-padding: 8px !important;
+            width: 32px !important;
+            height: 32px !important;
+            margin-right: 0 !important;
+            margin-left: 8px !important;
+            border-radius: 16px !important;
+            background-color: var(--natsumi-sdl2-haze-button-idle-color);
+            box-shadow: var(--natsumi-sdl2-haze-button-idle-shadow);
+            transition: background-color 0.2s ease;
+
+            &:hover {
+              background-color: var(--natsumi-sdl2-haze-button-hover-color) !important;
+            }
+
+            &:active {
+              background-color: var(--natsumi-sdl2-haze-button-active-color) !important;
+            }
+          }
+        }
+      }
+
+      tab-split-view-wrapper {
+        .tabbrowser-tab {
+          & > .tab-stack > .tab-content {
+            padding-left: calc(var(--tab-inner-inline-margin) + 4px) !important;
+            padding-right: calc(var(--tab-inner-inline-margin) - 5px) !important;
+
+            &::before {
+              left: 6px !important;
+              width: calc(100% - 45px) !important;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  #tabbrowser-tabs[expanded] {
+    #tabbrowser-arrowscrollbox {
+      .tabbrowser-tab {
+        & > .tab-stack > .tab-content {
+          padding-left: calc(var(--tab-inner-inline-margin) + 12px) !important;
+          padding-right: calc(var(--tab-inner-inline-margin) + 4px) !important;
+        }
+      }
+    }
+  }
+
+  #tabbrowser-tabs[orient="horizontal"] {
+    #tabbrowser-arrowscrollbox {
+      .tabbrowser-tab {
+        min-width: 80px !important;
+
+        & > .tab-stack > .tab-background {
+          margin-inline: 2px !important;
+        }
+
+        & > .tab-stack > .tab-content {
+          padding-left: 14px !important;
+          padding-right: 6px !important;
+
+          &::before {
+            left: 6px !important;
+            width: calc(100% - 48px) !important;
+          }
+        }
+      }
+    }
+
+    &[closebuttons="activetab"] {
+      #tabbrowser-arrowscrollbox {
+        .tabbrowser-tab {
+          &:hover:not([selected]) {
+            & > .tab-stack > .tab-content::before {
+              width: calc(100% - 12px) !important;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  #tabbrowser-tabs:not([expanded]):not([orient="horizontal"]) {
+    #tabbrowser-arrowscrollbox {
+      .tabbrowser-tab {
+        & > .tab-stack > .tab-background {
+          margin-block: 0 !important;
+          width: 40px !important;
+        }
+
+        & > .tab-stack > .tab-content {
+          &::before {
+            --natsumi-bubble-collapsed-padding: calc(var(--tab-inline-padding) - 8px);
+            width: 32px !important;
+            left: var(--natsumi-bubble-collapsed-padding) !important;
+          }
+        }
+      }
+    }
+
+    tab-split-view-wrapper {
+      .tabbrowser-tab {
+        & > .tab-stack > .tab-content {
+          .tab-icon-stack {
+            margin-inline: auto !important;
+          }
+
+          &::before {
+            --natsumi-bubble-collapsed-padding: 4px !important;
+          }
+        }
+      }
+    }
+  }
+
+  #sidebar-main:not([sidebar-launcher-expanded]), #sidebar-container:not([sidebar-launcher-expanded]) {
+    .tabbrowser-tab {
+      min-width: var(--floorp-tab-min-height, var(--tab-min-height)) !important;
+
+      & > .tab-stack > .tab-background {
+        min-width: calc(var(--floorp-tab-min-height, var(--tab-min-height)) - 4px) !important;
+        margin: 2px auto !important;
+      }
+    }
+
+    #tabbrowser-arrowscrollbox .tabbrowser-tab {
+      & > .tab-stack > .tab-background {
+        &::after {
+          width: calc(var(--floorp-tab-min-height, var(--tab-min-height)) - 4px) !important;
+        }
+      }
+    }
+  }
+
+  #tabs-newtab-button, #vertical-tabs-newtab-button {
+    min-height: calc(max(var(--floorp-tab-min-height, 36px), 36px) - 4px) !important;
+    transition: background-color 0.2s ease;
+    border-radius: var(--natsumi-tab-border-radius) !important;
+
+    .toolbarbutton-icon {
+      margin-bottom: 1px !important;
+    }
+  }
+
+  /* Ensure backdrop filters work */
+  #vertical-tabs, #TabsToolbar {
+    will-change: unset !important;
+  }
+}

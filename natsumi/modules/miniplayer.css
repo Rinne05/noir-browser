@@ -1,0 +1,961 @@
+/*
+
+Natsumi Browser - Welcome to your personal internet.
+
+Copyright (c) 2024-present Green (@greeeen-dev)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+/* ==== Natsumi Miniplayer ==== */
+
+@keyframes miniplayer-appear {
+  from {
+    translate: 0 10px;
+    opacity: 0;
+  }
+
+  to {
+    translate: 0 0;
+    opacity: 1;
+  }
+}
+
+@keyframes miniplayer-appear-horizontal {
+  from {
+    translate: 10px 0;
+    opacity: 0;
+  }
+
+  to {
+    translate: 0 0;
+    opacity: 1;
+  }
+}
+
+@keyframes miniplayer-scroll {
+  from {
+    translate: 0;
+  }
+
+  to {
+    translate: calc(var(--natsumi-animation-width) * -1);
+  }
+}
+
+@keyframes miniplayer-scrubber-pulse {
+  0% {
+    background-color: var(--natsumi-pulse-initial-color);
+  }
+
+  50% {
+    background-color: var(--natsumi-pulse-filled-color);
+  }
+
+  100% {
+    background-color: var(--natsumi-pulse-initial-color);
+  }
+}
+
+#vertical-tabs {
+  flex-direction: column;
+}
+
+#natsumi-miniplayer-container {
+  -moz-window-dragging: no-drag;
+  flex-direction: row;
+
+  @media -moz-pref("natsumi.miniplayer.disabled") {
+    display: none !important;
+  }
+
+  &:not([hide-margin]) {
+    margin: var(--tab-block-margin, 2px) var(--space-medium) !important;
+  }
+
+  @media -moz-pref("sidebar.verticalTabs") {
+    order: 1;
+    flex-direction: column;
+  }
+
+  @media -moz-pref("natsumi.miniplayer.scroll-view") and -moz-pref("sidebar.verticalTabs") {
+    display: inline-flex !important;
+    overflow-x: scroll;
+    flex-direction: row;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    gap: 10px;
+
+    &:not([hide-margin]) {
+      margin-top: calc(var(--tab-block-margin, 2px) + 1px) !important;
+    }
+  }
+
+  @media not -moz-pref("natsumi.sidebar.disable-bottom-toolbar") {
+    &:not([hide-margin]) {
+      margin-bottom: var(--natsumi-browser-separation) !important;
+    }
+  }
+}
+
+@media -moz-pref("natsumi.miniplayer.scroll-view") and -moz-pref("sidebar.verticalTabs") {
+  #sidebar-main, #sidebar-container {
+    &[sidebar-launcher-expanded] {
+      #natsumi-miniplayer-container:not([hide-margin]) {
+        margin: calc(var(--tab-block-margin, 2px) + 1px) calc(var(--tab-inner-inline-margin) - 4px) calc(var(--tab-block-margin, 2px) - 4px) !important;
+        padding: 4px !important;
+      }
+    }
+
+    &:not([sidebar-launcher-expanded]) {
+      #natsumi-miniplayer-container:not([hide-margin]) {
+        margin: calc(var(--tab-block-margin, 2px) + 1px) calc(var(--tab-inner-inline-margin) - 4px) calc(var(--tab-block-margin, 2px) - 4px) !important;
+        padding: 4px !important;
+      }
+    }
+  }
+}
+
+@media not -moz-pref("natsumi.sidebar.disable-bottom-toolbar") {
+  @media -moz-pref("natsumi.sidebar.autohide-bottom-toolbar") {
+    body[natsumi-bottom-toolbar-empty] {
+      #sidebar-container, #sidebar-main {
+        #natsumi-miniplayer-container:not([hide-margin]) {
+          margin-bottom: var(--natsumi-browser-separation) !important;
+        }
+      }
+    }
+
+    body:not([natsumi-bottom-toolbar-empty]) {
+      #natsumi-miniplayer-container:not([hide-margin]) {
+        margin-bottom: 0 !important;
+      }
+    }
+  }
+
+  @media not -moz-pref("natsumi.sidebar.autohide-bottom-toolbar") {
+    #natsumi-miniplayer-container:not([hide-margin]) {
+      margin-bottom: 0 !important;
+    }
+  }
+}
+
+.natsumi-miniplayer {
+  --animation-duration: 0.2s;
+  border-radius: var(--natsumi-tab-border-radius);
+  background: var(--natsumi-mat-hz-background);
+  backdrop-filter: var(--natsumi-mat-hz-backdrop);
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+  min-width: 100%;
+  min-height: var(--natsumi-miniplayer-min-height);
+  transition: min-height var(--animation-duration) ease, max-width var(--animation-duration) ease;
+  flex-direction: column;
+  overflow: hidden;
+  margin-top: 5px !important;
+
+  @media -moz-pref("natsumi.miniplayer.scroll-view") and -moz-pref("sidebar.verticalTabs") {
+    margin-top: auto !important;
+    scroll-snap-align: center;
+  }
+
+  @media not -moz-pref("natsumi.miniplayer.disable-dynamic-accent") {
+    &[miniplayer-has-custom-color][miniplayer-has-artwork] {
+      .natsumi-miniplayer-controls-container > *, .natsumi-miniplayer-scrubber-container > *, .natsumi-miniplayer-site-container, .natsumi-miniplayer-pin-button {
+        --natsumi-primary-color: oklch(from var(--natsumi-miniplayer-artwork-color) 0.825 0.1 h) !important;
+      }
+
+      @media -moz-pref("natsumi.miniplayer.disable-artwork") {
+        --natsumi-primary-color: oklch(from var(--natsumi-miniplayer-artwork-color) 0.825 0.1 h) !important;
+        transition: background 0.5s ease, min-height var(--animation-duration) ease;
+        background: var(--natsumi-mat-th-background);
+      }
+
+      &:not([miniplayer-has-artwork]) {
+        --natsumi-primary-color: oklch(from var(--natsumi-miniplayer-artwork-color) 0.825 0.1 h) !important;
+        transition: background 0.5s ease, min-height var(--animation-duration) ease;
+        background: var(--natsumi-mat-th-background);
+      }
+    }
+  }
+
+  &:not([hidden=true]) {
+    animation: miniplayer-appear 0.2s ease;
+
+    @media not -moz-pref("sidebar.verticalTabs") {
+      animation: miniplayer-appear-horizontal 0.2s ease;
+    }
+  }
+
+  &::before {
+    content: "";
+    width: calc(var(--natsumi-miniplayer-max-width, 100%) + 10px);
+    height: calc(var(--natsumi-miniplayer-max-height, 100%) + 10px);
+    position: absolute;
+    left: -5px;
+    top: -5px;
+    background-image: var(--natsumi-miniplayer-artwork);
+    background-size: cover;
+    background-position: center;
+    z-index: -1;
+    filter: blur(2px) brightness(0.6);
+    transition: width var(--animation-duration) ease, height var(--animation-duration) ease,
+                top var(--animation-duration) ease, left var(--animation-duration) ease;
+
+    @media -moz-pref("natsumi.miniplayer.disable-artwork") {
+      display: none;
+    }
+  }
+
+  &:hover, &[pinned] {
+    @media -moz-pref("sidebar.verticalTabs") {
+      min-height: var(--natsumi-miniplayer-max-height);
+    }
+
+    @media not -moz-pref("sidebar.verticalTabs") {
+      max-width: var(--natsumi-miniplayer-max-width) !important;
+    }
+
+    &[natsumi-no-scrubber] {
+      .natsumi-miniplayer-scrubber-container {
+        display: none !important;
+      }
+    }
+  }
+
+  &:not(:hover):not([pinned]) {
+    &::before {
+      width: calc(var(--natsumi-miniplayer-max-width, 100%) + 30px);
+      height: calc(var(--natsumi-miniplayer-max-height, 100%) + 30px);
+      left: -15px;
+      top: calc(calc(var(--natsumi-miniplayer-max-height, 100%) + 30px - var(--natsumi-miniplayer-min-height)) / -2);
+    }
+
+    .natsumi-miniplayer-info-container {
+      opacity: 0;
+      margin-bottom: -100% !important;
+    }
+
+    .natsumi-miniplayer-pip-button {
+      opacity: 1 !important;
+
+      &::before {
+        background-image: var(--natsumi-miniplayer-site-icon) !important;
+      }
+
+      &::after {
+        --natsumi-progress-color: var(--natsumi-primary-color);
+        content: "";
+        position: absolute;
+        width: 28px;
+        height: 28px;
+        box-sizing: border-box;
+        border-radius: 14px;
+        border: 2px solid var(--natsumi-progress-color);
+        mask-image: conic-gradient(black var(--natsumi-scrubber-position), transparent var(--natsumi-scrubber-position));
+        z-index: -1;
+
+        @media -moz-pref("natsumi.miniplayer.disable-artwork") {
+          --natsumi-progress-color: light-dark(var(--natsumi-colors-primary), var(--natsumi-primary-color));
+        }
+      }
+    }
+  }
+
+  .natsumi-miniplayer-info-container {
+    flex-direction: column;
+    transition: margin var(--animation-duration) ease, opacity var(--animation-duration) ease;
+    padding: 4px !important;
+  }
+
+  .natsumi-miniplayer-top-container {
+    gap: 4px;
+  }
+
+  .natsumi-miniplayer-site-container {
+    padding: 4px !important;
+    border-radius: 8px !important;
+    transition: background-color var(--animation-duration) ease, box-shadow var(--animation-duration) ease;
+    flex: 1;
+
+    .natsumi-miniplayer-site-icon {
+      width: 16px;
+      height: 16px;
+      background-image: var(--natsumi-miniplayer-site-icon);
+      background-size: 16px;
+    }
+
+    .natsumi-miniplayer-site-name {
+      margin: auto 0 !important;
+      margin-left: 4px !important;
+      font-size: 10px;
+      color: white;
+
+      @media -moz-pref("natsumi.miniplayer.disable-artwork") {
+        color: light-dark(black, white);
+      }
+    }
+
+    &:hover {
+      background-color: var(--natsumi-button-hover-color-dark);
+
+      @media -moz-pref("natsumi.miniplayer.disable-artwork") {
+        background-color: var(--natsumi-button-hover-color);
+      }
+    }
+
+    &:active {
+      background-color: var(--natsumi-button-active-color-dark);
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+
+      @media -moz-pref("natsumi.miniplayer.disable-artwork") {
+        background-color: var(--natsumi-button-active-color);
+      }
+    }
+  }
+
+  .natsumi-miniplayer-pin-button {
+    min-width: 24px;
+    height: 24px;
+    padding: 5px !important;
+    border-radius: 8px !important;
+    transition: background-color var(--animation-duration) ease, box-shadow var(--animation-duration) ease,
+                opacity var(--animation-duration) ease;
+    -moz-context-properties: stroke, fill;
+    stroke: white;
+    background-image: url("../icons/lucide/pin.svg");
+    background-size: 14px;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    @media -moz-pref("natsumi.miniplayer.disable-artwork") {
+      stroke: light-dark(black, white);
+    }
+
+    &:hover {
+      background-color: var(--natsumi-button-hover-color-dark);
+
+      @media -moz-pref("natsumi.miniplayer.disable-artwork") {
+        background-color: var(--natsumi-button-hover-color);
+      }
+    }
+
+    &:active {
+      background-color: var(--natsumi-button-active-color-dark);
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+
+      @media -moz-pref("natsumi.miniplayer.disable-artwork") {
+        background-color: var(--natsumi-button-active-color);
+      }
+    }
+  }
+
+  &[pinned] {
+    .natsumi-miniplayer-pin-button, .natsumi-miniplayer-pin-button:hover {
+      background-color: var(--natsumi-button-active-color-dark);
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+
+      @media -moz-pref("natsumi.miniplayer.disable-artwork") {
+        background-color: var(--natsumi-button-active-color);
+      }
+    }
+  }
+
+  .natsumi-miniplayer-title-container {
+    padding-inline: 4px !important;
+    overflow: hidden;
+
+    .natsumi-miniplayer-title-scrollable {
+      gap: 150px;
+
+      &[animate-overflow] {
+        animation: miniplayer-scroll var(--natsumi-animation-duration) linear;
+      }
+    }
+
+    .natsumi-miniplayer-title {
+      display: inline-block !important;
+      min-width: fit-content;
+      text-wrap: nowrap;
+      font-size: large;
+      font-weight: bold;
+      color: white;
+
+      @media -moz-pref("natsumi.miniplayer.disable-artwork") {
+        color: light-dark(black, white);
+      }
+    }
+  }
+
+  &[natsumi-title-overflow] {
+    .natsumi-miniplayer-title-container {
+      mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0), black 4px, black calc(100% - 4px), rgba(0, 0, 0, 0));
+    }
+  }
+
+  &:not([natsumi-title-overflow]) {
+    .natsumi-miniplayer-title[duplicate] {
+      display: none !important;
+    }
+  }
+
+  .natsumi-miniplayer-author-container {
+    padding-inline: 4px !important;
+    opacity: 0.7;
+    overflow: hidden;
+
+    .natsumi-miniplayer-artist {
+      display: inline-block !important;
+      font-size: 12px;
+      color: white;
+      text-wrap: nowrap;
+
+      @media -moz-pref("natsumi.miniplayer.disable-artwork") {
+        color: light-dark(black, white);
+      }
+    }
+
+    .natsumi-miniplayer-author-scrollable {
+      gap: 150px;
+
+      &[animate-overflow] {
+        animation: miniplayer-scroll var(--natsumi-animation-duration) linear;
+      }
+    }
+  }
+
+  .natsumi-miniplayer-scrubber-container {
+    padding-inline: 4px !important;
+    margin-top: 6px;
+    min-height: 12px;
+    color: white;
+
+    @media -moz-pref("natsumi.miniplayer.disable-artwork") {
+      color: light-dark(black, white);
+    }
+
+    .natsumi-miniplayer-position, .natsumi-miniplayer-duration {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .natsumi-miniplayer-scrubber {
+      display: grid;
+      width: -moz-available;
+      height: 6px;
+      margin: auto 8px;
+      border-radius: 3px;
+      background-color: rgba(255, 255, 255, 0.3);
+      grid-template-columns: 1fr;
+      --natsumi-pulse-initial-color: rgba(255, 255, 255, 0.3);
+      --natsumi-pulse-filled-color: var(--natsumi-primary-color);
+
+      @media -moz-pref("natsumi.miniplayer.disable-artwork") {
+        background-color: light-dark(rgba(0, 0, 0, 0.3), rgba(255, 255, 255, 0.3));
+        --natsumi-pulse-initial-color: light-dark(rgba(0, 0, 0, 0.3), rgba(255, 255, 255, 0.3));
+        --natsumi-pulse-filled-color: light-dark(var(--natsumi-colors-primary), var(--natsumi-primary-color));
+      }
+
+      &[pulsing] {
+        animation: miniplayer-scrubber-pulse 2s ease 5;
+
+        &::before, &::after {
+          opacity: 0 !important;
+        }
+      }
+
+      &:not([pulsing]) {
+        transition: background-color 0.2s ease, height 0.2s ease, border-radius 0.2s ease;
+      }
+
+      &[natsumi-scrubber-scroll]:hover {
+        height: 12px;
+        border-radius: 6px;
+        cursor: none;
+
+        &::before {
+          height: 12px;
+          border-radius: 6px;
+          min-width: 12px;
+        }
+
+        &::after {
+          margin-top: 0;
+          scale: 1 !important;
+          opacity: 0;
+        }
+      }
+
+      &:hover:not([natsumi-scrubber-scroll]), &:active:not([natsumi-scrubber-scroll]) {
+        &::after {
+          scale: 1.2;
+        }
+
+        background-color: rgba(255, 255, 255, 0.5);
+
+        @media -moz-pref("natsumi.miniplayer.disable-artwork") {
+          background-color: light-dark(rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.5));
+        }
+      }
+
+      &::before {
+        content: "";
+        width: var(--natsumi-scrubber-position);
+        height: 6px;
+        border-radius: 3px;
+        grid-row-start: 1;
+        grid-column-start: 1;
+        background-color: var(--natsumi-primary-color);
+        transition: height 0.2s ease, border-radius 0.2s ease;
+
+        @media -moz-pref("natsumi.miniplayer.disable-artwork") {
+          background-color: light-dark(var(--natsumi-colors-primary), var(--natsumi-primary-color));
+        }
+      }
+
+      &::after {
+        content: "";
+        width: 12px;
+        height: 12px;
+        margin-top: -3px;
+        margin-left: var(--natsumi-scrubber-position);
+        border-radius: 6px;
+        translate: -6px;
+        grid-row-start: 1;
+        grid-column-start: 1;
+        background-color: var(--natsumi-primary-color);
+        transition: scale 0.2s ease, margin-top 0.2s ease, opacity 0.2s ease;
+
+        @media -moz-pref("natsumi.miniplayer.disable-artwork") {
+          background-color: light-dark(var(--natsumi-colors-primary), var(--natsumi-primary-color));
+        }
+      }
+    }
+  }
+
+  &[scrubber-hidden] {
+    .natsumi-miniplayer-scrubber-container {
+      display: none;
+    }
+
+    .natsumi-miniplayer-pip-button::after {
+      display: none;
+    }
+  }
+
+  &[natsumi-author-overflow] {
+    .natsumi-miniplayer-author-container {
+      mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0), black 4px, black calc(100% - 4px), rgba(0, 0, 0, 0));
+    }
+  }
+
+  &:not([natsumi-author-overflow]) {
+    .natsumi-miniplayer-artist[duplicate] {
+      display: none !important;
+    }
+  }
+
+  &[animations-disabled] {
+    .natsumi-miniplayer-title-scrollable, .natsumi-miniplayer-author-scrollable {
+      animation: none !important;
+      max-width: -moz-available;
+    }
+
+    .natsumi-miniplayer-title, .natsumi-miniplayer-artist {
+      min-width: -moz-available !important;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .natsumi-miniplayer-title[duplicate], .natsumi-miniplayer-artist[duplicate] {
+      display: none !important;
+    }
+  }
+
+  .natsumi-miniplayer-controls-container {
+    margin-top: auto !important;
+    width: 100%;
+    padding: 4px !important;
+    justify-content: space-between;
+
+    .natsumi-miniplayer-pin-button {
+      background-image: none !important;
+    }
+
+    & > * {
+      min-width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+
+      &[disabled="true"] {
+        opacity: 0.5;
+        pointer-events: none;
+      }
+
+      &:hover {
+        background-color: var(--natsumi-button-hover-color-dark);
+
+        @media -moz-pref("natsumi.miniplayer.disable-artwork") {
+          background-color: var(--natsumi-button-hover-color);
+        }
+      }
+
+      &:active, &:hover:active {
+        background-color: var(--natsumi-button-active-color-dark);
+        box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+
+        @media -moz-pref("natsumi.miniplayer.disable-artwork") {
+          background-color: var(--natsumi-button-active-color);
+        }
+      }
+
+      &::before {
+        content: "";
+        width: 16px;
+        height: 16px;
+        background-size: 16px !important;
+        background-repeat: no-repeat !important;
+        background-position: center !important;
+        pointer-events: none;
+        margin: auto !important;
+        -moz-context-properties: stroke, stroke-opacity;
+        stroke: white;
+
+        @media -moz-pref("natsumi.miniplayer.disable-artwork") {
+          stroke: light-dark(black, white);
+        }
+      }
+    }
+
+    .natsumi-miniplayer-pin-button::before {
+      background-image: url("../icons/lucide/pin.svg");
+    }
+
+    .natsumi-miniplayer-pip-button::before {
+      background-image: url("../icons/lucide/pip.svg");
+    }
+
+    .natsumi-miniplayer-prevtrack-button::before {
+      background-image: url("../icons/lucide/previous-track.svg");
+    }
+
+    .natsumi-miniplayer-pauseplay-button::before {
+      background-image: url("../icons/lucide/pause.svg");
+    }
+
+    .natsumi-miniplayer-nexttrack-button::before {
+      background-image: url("../icons/lucide/next-track.svg");
+    }
+
+    .natsumi-miniplayer-mute-button::before {
+      background-image: url("../icons/lucide/volume.svg");
+    }
+  }
+
+  &[alternate-buttons="true"] {
+    .natsumi-miniplayer-prevtrack-button, .natsumi-miniplayer-nexttrack-button {
+      display: grid !important;
+      grid-template-columns: 1fr;
+
+      &::before {
+        grid-row-start: 1;
+        grid-column-start: 1;
+      }
+
+      &::after {
+        content: "5";
+        margin: auto !important;
+        grid-row-start: 1;
+        grid-column-start: 1;
+        color: white;
+        font-size: 8px;
+
+        @media -moz-pref("natsumi.miniplayer.disable-artwork") {
+          color: light-dark(black, white);
+        }
+      }
+    }
+
+    .natsumi-miniplayer-prevtrack-button::before {
+      background-image: url("../icons/lucide/rotate-left.svg");
+    }
+
+    .natsumi-miniplayer-nexttrack-button::before {
+      background-image: url("../icons/lucide/rotate-right.svg");
+    }
+  }
+
+  &[playing="false"] {
+    .natsumi-miniplayer-pauseplay-button::before {
+      background-image: url("../icons/lucide/play.svg");
+    }
+  }
+
+  &[muted="true"] {
+    .natsumi-miniplayer-mute-button::before {
+      background-image: url("../icons/lucide/volume-off.svg");
+    }
+  }
+
+  &:not([miniplayer-has-artwork]) {
+    &::before {
+      background-image: none !important;
+    }
+
+    .natsumi-miniplayer-site-container {
+      .natsumi-miniplayer-site-name {
+        color: light-dark(black, white);
+      }
+
+      &:hover {
+        background-color: var(--natsumi-button-hover-color);
+      }
+
+      &:active {
+        background-color: var(--natsumi-button-active-color);
+      }
+    }
+
+    .natsumi-miniplayer-pin-button {
+      stroke: light-dark(black, white);
+
+      &:hover {
+        background-color: var(--natsumi-button-hover-color);
+      }
+
+      &:active {
+        background-color: var(--natsumi-button-active-color);
+      }
+    }
+
+    &[pinned] .natsumi-miniplayer-pin-button {
+      background-color: var(--natsumi-button-active-color);
+    }
+
+    .natsumi-miniplayer-title-container {
+      .natsumi-miniplayer-title {
+        color: light-dark(black, white);
+      }
+    }
+
+    .natsumi-miniplayer-author-container {
+      .natsumi-miniplayer-artist {
+        color: light-dark(black, white);
+      }
+    }
+
+    .natsumi-miniplayer-scrubber-container {
+      color: light-dark(black, white);
+
+      .natsumi-miniplayer-scrubber {
+        background-color: light-dark(rgba(0, 0, 0, 0.3), rgba(255, 255, 255, 0.3));
+        --natsumi-pulse-initial-color: light-dark(rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.5));
+        --natsumi-pulse-filled-color: light-dark(var(--natsumi-colors-primary), var(--natsumi-primary-color));
+
+        &:hover, &:active {
+          background-color: light-dark(rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.5));
+        }
+
+        &::before {
+          background-color: light-dark(var(--natsumi-colors-primary), var(--natsumi-primary-color));
+        }
+
+        &::after {
+          background-color: light-dark(var(--natsumi-colors-primary), var(--natsumi-primary-color));
+        }
+      }
+    }
+
+    .natsumi-miniplayer-controls-container {
+      & > * {
+        &:hover {
+          background-color: var(--natsumi-button-hover-color);
+        }
+
+        &:active {
+          background-color: var(--natsumi-button-active-color);
+        }
+
+        &::before {
+          stroke: light-dark(black, white);
+        }
+      }
+
+      .natsumi-miniplayer-prevtrack-button, .natsumi-miniplayer-nexttrack-button {
+        &::before {
+          stroke: light-dark(black, white);
+        }
+
+        &::after {
+          color: light-dark(black, white);
+        }
+      }
+    }
+  }
+}
+
+#sidebar-container[sidebar-launcher-expanded], #sidebar-main[sidebar-launcher-expanded] {
+  .natsumi-miniplayer {
+    .natsumi-miniplayer-controls-container .natsumi-miniplayer-pin-button {
+      display: none;
+    }
+  }
+}
+
+#sidebar-container:not([sidebar-launcher-expanded]), #sidebar-main:not([sidebar-launcher-expanded]), #nav-bar {
+  #natsumi-miniplayer-container {
+    @media -moz-pref("sidebar.verticalTabs") {
+      max-width: var(--tab-collapsed-background-width) !important;
+    }
+
+    @media not -moz-pref("sidebar.verticalTabs") {
+      display: flex !important;
+      margin: 0 6px !important;
+      flex-align: row !important;
+      align-items: center;
+      gap: 4px;
+
+      &:not(:has(.natsumi-miniplayer:not([hidden]))) {
+        margin-inline: 0 !important;
+      }
+    }
+
+    .natsumi-miniplayer-scrubber-container {
+      display: none !important;
+    }
+  }
+
+  .natsumi-miniplayer {
+    @media not -moz-pref("sidebar.verticalTabs") {
+      min-width: 32px !important;
+      height: 32px !important;
+      margin-top: 0 !important;
+    }
+
+    .natsumi-miniplayer-info-container {
+      display: none;
+    }
+
+    .natsumi-miniplayer-controls-container {
+      padding: calc(calc(var(--tab-collapsed-background-width) - 28px) / 2) !important;
+
+      @media -moz-pref("sidebar.verticalTabs") {
+        flex-direction: column;
+      }
+
+      @media not -moz-pref("sidebar.verticalTabs") {
+        margin-top: 0 !important;
+        padding-block: 2px !important;
+      }
+
+      & > * {
+        border-radius: calc(var(--natsumi-tab-border-radius) - 2px) !important;
+      }
+    }
+
+    .natsumi-miniplayer-prevtrack-button, .natsumi-miniplayer-pauseplay-button, .natsumi-miniplayer-nexttrack-button,
+    .natsumi-miniplayer-mute-button, .natsumi-miniplayer-pin-button {
+      transition: margin var(--animation-duration) ease, background-color 0.2s ease, box-shadow 0.2s ease, opacity var(--animation-duration) ease;
+    }
+
+    &:not(:hover):not([pinned]) {
+      @media -moz-pref("sidebar.verticalTabs") {
+        min-height: var(--tab-collapsed-background-width) !important;
+
+        &::before {
+          height: calc(var(--natsumi-miniplayer-min-height, 100%) + 30px) !important;
+          top: -15px !important;
+        }
+
+        .natsumi-miniplayer-prevtrack-button, .natsumi-miniplayer-pauseplay-button, .natsumi-miniplayer-nexttrack-button, .natsumi-miniplayer-mute-button {
+          margin-bottom: -100% !important;
+          opacity: 0;
+        }
+
+        .natsumi-miniplayer-pin-button {
+          margin-top: calc(-100% - 6px) !important;
+          opacity: 0;
+        }
+      }
+
+      @media not -moz-pref("sidebar.verticalTabs") {
+        max-width: 32px !important;
+
+        .natsumi-miniplayer-prevtrack-button, .natsumi-miniplayer-pauseplay-button, .natsumi-miniplayer-nexttrack-button, .natsumi-miniplayer-mute-button {
+          margin-right: -100% !important;
+          opacity: 0;
+        }
+
+        .natsumi-miniplayer-pin-button {
+          margin-left: -100% !important;
+          opacity: 0;
+        }
+      }
+    }
+  }
+}
+
+@media -moz-pref("sidebar.verticalTabs") {
+  #sidebar-container[sidebar-launcher-expanded], #sidebar-main[sidebar-launcher-expanded] {
+    .natsumi-miniplayer {
+      --natsumi-miniplayer-min-height: 36px;
+      --natsumi-miniplayer-max-height: 128px;
+
+      &[natsumi-no-scrubber] {
+        --natsumi-miniplayer-max-height: 110px;
+      }
+    }
+  }
+
+  #sidebar-container:not([sidebar-launcher-expanded]), #sidebar-main:not([sidebar-launcher-expanded]) {
+    --natsumi-miniplayer-max-height: 172px;
+    --natsumi-miniplayer-min-height: 32px;
+  }
+}
+
+@media not -moz-pref("sidebar.verticalTabs") {
+  .natsumi-miniplayer {
+    --natsumi-miniplayer-max-width: 176px;
+    --natsumi-miniplayer-min-height: 32px;
+  }
+}
+
+#natsumi-miniplayer-counter-container {
+  display: none;
+  order: 2;
+
+  @media -moz-pref("natsumi.miniplayer.scroll-view") and -moz-pref("sidebar.verticalTabs") {
+    display: flex;
+    margin: 0 auto !important;
+    gap: 4px;
+  }
+
+  .natsumi-miniplayer-counter-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 2px;
+    background: light-dark(black, white);
+    opacity: 0.5;
+
+    &[active] {
+      opacity: 1;
+    }
+  }
+}

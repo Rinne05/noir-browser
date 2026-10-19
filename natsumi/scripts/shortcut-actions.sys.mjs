@@ -1,0 +1,408 @@
+/*
+
+Natsumi Browser - Welcome to your personal internet.
+
+Copyright (c) 2024-present Green (@greeeen-dev)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+import {NatsumiNotification} from "./notifications.sys.mjs";
+import * as ucApi from "chrome://userchromejs/content/uc_api.sys.mjs";
+
+const lazy = {};
+
+XPCOMUtils.defineLazyServiceGetter(
+    lazy,
+    "QueryStringStripper",
+    "@mozilla.org/url-query-string-stripper;1",
+    Ci.nsIURLQueryStringStripper
+);
+
+let urlCleaner;
+
+function getCurrentUrl() {
+    let copyCleanIfPossible = false;
+    if (ucApi.Prefs.get("natsumi.browser.copy-clean-link").exists()) {
+        copyCleanIfPossible = ucApi.Prefs.get("natsumi.browser.copy-clean-link").value;
+    }
+
+    let currentUrl = gBrowser.currentURI.spec;
+
+    if (copyCleanIfPossible) {
+        // Get clean URL
+        let cleanedLink;
+
+        try {
+            cleanedLink = lazy.QueryStringStripper.stripForCopyOrShare(gBrowser.currentURI);
+        } catch(e) {
+            console.warn("Failed to get clean URL, falling back to current URL:", e);
+        }
+
+        if (cleanedLink) {
+            currentUrl = Services.io.createExposableURI(cleanedLink)?.displaySpec ?? gBrowser.currentURI.spec;
+        }
+    }
+
+    return currentUrl;
+}
+
+export class NatsumiShortcutActions {
+    static copyCurrentUrl() {
+        let currentUrl = getCurrentUrl();
+        navigator.clipboard.writeText(currentUrl);
+
+        // Add to notifications
+        let notificationObject = new NatsumiNotification("Copied URL to clipboard!", null, "chrome://natsumi/content/icons/lucide/copy.svg")
+        notificationObject.addToContainer();
+    }
+
+    static copyCurrentUrlMarkdown() {
+        const currentUrl = getCurrentUrl();
+        const currentTabName = gBrowser.selectedTab.label;
+        navigator.clipboard.writeText(`[${currentTabName}](${currentUrl})`);
+
+        // Add to notifications
+        let notificationObject = new NatsumiNotification("Copied URL as Markdown to clipboard!", null, "chrome://natsumi/content/icons/lucide/copy.svg")
+        notificationObject.addToContainer();
+    }
+
+    static toggleBrowserLayout() {
+        let isSingleToolbar = false;
+        if (ucApi.Prefs.get("natsumi.theme.single-toolbar").exists()) {
+            isSingleToolbar = ucApi.Prefs.get("natsumi.theme.single-toolbar").value;
+        }
+
+        if (!ucApi.Prefs.get("sidebar.verticalTabs").value) {
+            return;
+        }
+
+        ucApi.Prefs.get("natsumi.theme.single-toolbar").value = !isSingleToolbar;
+    }
+
+    static toggleVerticalTabs() {
+        ucApi.Prefs.get("sidebar.verticalTabs").value = !ucApi.Prefs.get("sidebar.verticalTabs").value;
+    }
+
+    static toggleCompactMode() {
+        if (!document.body.natsumiCompactModeManager) {
+            // Compact mode manager isn't initialized yet (or is broken)
+            return;
+        }
+
+        if (document.body.attributes["natsumi-compact-mode"]) {
+            document.body.natsumiCompactModeManager.disableCompactMode(true);
+        } else {
+            document.body.natsumiCompactModeManager.enableCompactMode(true);
+        }
+    }
+
+    static toggleCompactSidebar() {
+        if (!(document.body.hasAttribute("natsumi-compact-mode"))) {
+            return;
+        }
+
+        if (document.body.hasAttribute("natsumi-compact-sidebar-extend")) {
+            document.body.removeAttribute("natsumi-compact-sidebar-extend");
+        } else {
+            document.body.setAttribute("natsumi-compact-sidebar-extend", "");
+        }
+    }
+
+    static toggleCompactNavbar() {
+        if (!(document.body.hasAttribute("natsumi-compact-mode"))) {
+            return;
+        }
+
+        if (document.body.hasAttribute("natsumi-compact-navbar-extend")) {
+            document.body.removeAttribute("natsumi-compact-navbar-extend");
+        } else {
+            document.body.setAttribute("natsumi-compact-navbar-extend", "");
+        }
+    }
+
+    static cycleWorkspaces(reverse = false) {
+        if (!document.body.natsumiWorkspacesWrapper) {
+            return;
+        }
+
+        if (!document.body.natsumiWorkspacesWrapper.properInit) {
+            return;
+        }
+
+        const workspaceIds = document.body.natsumiWorkspacesWrapper.getAllWorkspaceIDs(true);
+        const currentWorkspace = document.body.natsumiWorkspacesWrapper.getCurrentWorkspaceID();
+        let currentWorkspaceIndex = workspaceIds.indexOf(currentWorkspace);
+
+        if (reverse) {
+            currentWorkspaceIndex--;
+        } else {
+            currentWorkspaceIndex++;
+        }
+
+        if (currentWorkspaceIndex < 0) {
+            currentWorkspaceIndex = workspaceIds.length - 1;
+        } else if (currentWorkspaceIndex >= workspaceIds.length) {
+            currentWorkspaceIndex = 0;
+        }
+
+        const newWorkspaceId = workspaceIds[currentWorkspaceIndex];
+        document.body.natsumiWorkspacesWrapper.setCurrentWorkspaceID(newWorkspaceId);
+    }
+
+    static closeGlimpse() {
+        if (!window.natsumiGlimpse) {
+            return;
+        }
+
+        if (window.natsumiGlimpse.currentGlimpseTab) {
+            // Get Glimpse tab
+            let glimpseParentTabId = window.natsumiGlimpse.currentGlimpseTab.linkedPanel;
+            let glimpseData = window.natsumiGlimpse.glimpse[glimpseParentTabId];
+
+            if (glimpseData) {
+                let currentGlimpseIndex = glimpseData["index"];
+                let currentGlimpseTab = glimpseData["tabs"][currentGlimpseIndex];
+
+                if (glimpseData["tabs"].length <= 1) {
+                    window.natsumiGlimpse.deactivateGlimpseWithAnim(currentGlimpseTab);
+                } else {
+                    window.natsumiGlimpse.deactivateGlimpse(currentGlimpseTab, true);
+                }
+            }
+        }
+    }
+
+    static graduateGlimpse() {
+        if (!window.natsumiGlimpse) {
+            return;
+        }
+
+        if (window.natsumiGlimpse.currentGlimpseTab) {
+            // Get Glimpse tab
+            let glimpseParentTabId = window.natsumiGlimpse.currentGlimpseTab.linkedPanel;
+            let glimpseData = window.natsumiGlimpse.glimpse[glimpseParentTabId];
+
+            if (glimpseData) {
+                let currentGlimpseIndex = glimpseData["index"];
+                let currentGlimpseTab = glimpseData["tabs"][currentGlimpseIndex];
+                window.natsumiGlimpse.graduateGlimpseWithAnim(currentGlimpseTab);
+            }
+        }
+    }
+
+    static cycleGlimpse(forward = true) {
+        if (!window.natsumiGlimpse) {
+            return;
+        }
+
+        if (window.natsumiGlimpse.currentGlimpseTab) {
+            // Get Glimpse tab
+            let glimpseParentTabId = window.natsumiGlimpse.currentGlimpseTab.linkedPanel;
+            let glimpseData = window.natsumiGlimpse.glimpse[glimpseParentTabId];
+
+            if (glimpseData) {
+                window.natsumiGlimpse.cycleGlimpseTabs(glimpseParentTabId, forward);
+            }
+        }
+    }
+
+    static toggleGlimpseChain() {
+        if (document.body.natsumiGlimpseChainer) {
+            const chainActive = document.body.natsumiGlimpseChainer.chainingGlimpse;
+
+            if (chainActive) {
+                document.body.natsumiGlimpseChainer.cancelChain();
+            } else {
+                document.body.natsumiGlimpseChainer.activateChaining();
+            }
+        }
+    }
+
+    static releaseGlimpseChain() {
+        if (document.body.natsumiGlimpseChainer) {
+            const chainActive = document.body.natsumiGlimpseChainer.chainingGlimpse;
+
+            if (chainActive) {
+                document.body.natsumiGlimpseChainer.releaseChain();
+            }
+        }
+    }
+
+    static openNewTab() {
+        let replaceNewTab = false;
+
+        if (ucApi.Prefs.get("natsumi.tabs.replace-new-tab").exists()) {
+            replaceNewTab = ucApi.Prefs.get("natsumi.tabs.replace-new-tab").value;
+        }
+
+        if (replaceNewTab) {
+            let commandEvent = new Event("command", {bubbles: true, cancelable: true});
+            document.body.natsumiURLBarController.openAsNewTab(commandEvent);
+        } else {
+            // Open new tab
+            let keyElement = document.getElementById("key_newNavigatorTab");
+            keyElement.doCommand();
+        }
+    }
+
+    static clearUnpinnedTabs() {
+        if (document.body.natsumiUnpinnedTabsClearer) {
+            document.body.natsumiUnpinnedTabsClearer.clearTabs();
+        }
+    }
+
+    static openGlimpseLauncher() {
+        if (document.body.natsumiGlimpseLauncher) {
+            document.body.natsumiGlimpseLauncher.activateLauncher();
+        }
+    }
+
+    static splitTabs() {
+        // Check if we can use extended split view limit
+        let extendedSplitView = false;
+        if (document.getElementById("floorp-split-view-styles") != null) {
+            extendedSplitView = true;
+        }
+
+        // The split view limit for Firefox is 2
+        let splitViewLimit = 2;
+        if (extendedSplitView) {
+            // For Floorp, the split view limit is 4 tabs (for now)
+            splitViewLimit = 4;
+        }
+
+        // Enforce split view limit
+        if (gBrowser.multiSelectedTabsCount > splitViewLimit) {
+            return;
+        }
+
+        let selectedTabs = gBrowser.selectedTabs;
+        let unpinnedTabsNode = document.getElementById("tabbrowser-arrowscrollbox");
+        let unpinnedTabs = Array.from(unpinnedTabsNode.querySelectorAll(".tabbrowser-tab:not([hidden])"));
+        let firstTab = selectedTabs[0];
+        let toSplitTabs = [firstTab];
+        let insertBefore = gBrowser.selectedTab;
+
+        if (firstTab.hasAttribute("natsumi-glimpse-tab")) {
+            // We can't split this
+            return;
+        }
+
+        if (selectedTabs.length === 1) {
+            let secondTab;
+
+            // Get tab index
+            let tabIndex = unpinnedTabs.indexOf(firstTab);
+
+            if (tabIndex === unpinnedTabs.length - 1) {
+                // Split with previous tab
+                secondTab = unpinnedTabs[tabIndex - 1];
+            } else {
+                // Split with next tab
+                while (tabIndex < unpinnedTabs.length) {
+                    // Ensure our tab isn't a Glimpse tab
+                    secondTab = unpinnedTabs[tabIndex + 1];
+                    if (!secondTab.hasAttribute("natsumi-glimpse-tab")) {
+                        break;
+                    }
+                }
+            }
+
+            toSplitTabs.push(secondTab)
+        } else {
+            for (let i = 0; i < selectedTabs.length - 1; i++) {
+                toSplitTabs.push(selectedTabs[i + 1]);
+            }
+        }
+
+        // Check that tabs are not pinned and not in split view
+        for (let tab of selectedTabs) {
+            if (tab.pinned || tab.splitview) {
+                return;
+            }
+        }
+
+        let additionalData = {};
+        if (insertBefore) {
+            additionalData = {insertBefore};
+        }
+
+        gBrowser.addTabSplitView(toSplitTabs, additionalData);
+    }
+
+    static unsplitTabs() {
+        // Use current selected tab
+        let selectedTab = gBrowser.selectedTab;
+
+        if (selectedTab.splitview) {
+            if (gBrowser.unsplitTabs !== undefined) {
+                gBrowser.unsplitTabs(selectedTab.splitview);
+            } else {
+                selectedTab.splitview.unsplitTabs();
+            }
+        }
+    }
+
+    static selectTab(index, useAbsolute = false) {
+        let pinnedTabsNode = document.getElementById("pinned-tabs-container") ?? document.getElementById("vertical-pinned-tabs-container");
+        let unpinnedTabsNode = document.getElementById("tabbrowser-arrowscrollbox");
+
+        // Set tab selector condition
+        const tabSelector = "tab:not([hidden]):not([natsumi-workspace-hidden]):not([natsumi-glimpse-tab])"
+
+        // Get tabs
+        const pinnedTabs = Array.from(pinnedTabsNode.querySelectorAll(tabSelector));
+        const unpinnedTabs = Array.from(unpinnedTabsNode.querySelectorAll(tabSelector));
+        let allTabs = pinnedTabs.concat(unpinnedTabs);
+
+        if (ucApi.Prefs.get("natsumi.tabs.tab-switcher-unpinned-only").exists()) {
+            if (ucApi.Prefs.get("natsumi.tabs.tab-switcher-unpinned-only").value) {
+                allTabs = unpinnedTabs;
+            }
+        }
+
+        console.log(allTabs);
+
+        // Sanity check index
+        if (index < 0) {
+            console.error("Index must be 1 or higher");
+        } else if (index >= 8 && !useAbsolute) {
+            // If index is 8, then usually we would select the last tab.
+            // This behavior can be overridden by using useAbsolute
+            index = allTabs.length - 1;
+        }
+
+        if (index >= allTabs.length) {
+            return;
+        }
+
+        // Select tab
+        gBrowser.selectedTab = allTabs[index];
+    }
+
+    static showCommandPalette() {
+        if (!document.body.natsumiGesturesWrapper) {
+            return;
+        }
+
+        document.body.natsumiGesturesWrapper.executeAction("floorp-toggle-command-palette");
+    }
+}

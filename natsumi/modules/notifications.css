@@ -1,0 +1,242 @@
+/*
+
+Natsumi Browser - Welcome to your personal internet.
+
+Copyright (c) 2024-present Green (@greeeen-dev)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+@keyframes notification-appear {
+  from {
+    opacity: 0;
+    scale: 0;
+  }
+
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes notification-disappear {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+#natsumi-notifications-container {
+  position: absolute;
+  top: 50px;
+  right: 20px;
+  z-index: 999;
+  text-align: right;
+
+  @media -moz-pref("natsumi.theme.single-toolbar") {
+    top: 40px;
+  }
+
+  @media not -moz-pref("sidebar.verticalTabs") {
+    top: 90px;
+  }
+
+  @media not -moz-pref("sidebar.position_start") {
+    right: unset !important;
+    left: 20px;
+  }
+
+  &[style*="--natsumi-notifications-overflow"] {
+    &::after {
+      content: var(--natsumi-notifications-overflow);
+      position: relative !important;
+      background-color: var(--natsumi-mat-th-background);
+      border: var(--natsumi-mat-hz-border) !important;
+      backdrop-filter: var(--natsumi-mat-hz-backdrop) !important;
+      box-shadow: var(--natsumi-mat-hz-shadow) !important;
+      padding: 6px 8px !important;
+      border-radius: 8px;
+      top: 8px !important;
+      font-size: small;
+    }
+  }
+
+  .natsumi-notification {
+    text-align: left;
+    font-size: medium;
+    padding: 10px 15px !important;
+    border-radius: 15px !important;
+    background-color: var(--natsumi-mat-th-background);
+    border: var(--natsumi-mat-hz-border) !important;
+    backdrop-filter: var(--natsumi-mat-hz-backdrop) !important;
+    box-shadow: var(--natsumi-mat-hz-shadow) !important;
+    margin-bottom: 10px !important;
+    animation: notification-appear 0.3s ease;
+    max-width: 70vw;
+    word-break: break-word;
+
+    .natsumi-notification-body {
+      transition: opacity 0.2s ease;
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      left: 50%;
+      top: 50%;
+      translate: -50% -50% !important;
+      transition: opacity 0.2s ease;
+      opacity: 0;
+      z-index: 1;
+      -moz-context-properties: stroke, stroke-opacity;
+      stroke: light-dark(black, white);
+      background-image: url("../icons/lucide/close.svg");
+    }
+
+    &[natsumi-notification-type="warning"] {
+      --natsumi-primary-color: #ffaa00;
+    }
+
+    &[natsumi-notification-type="caution"] {
+      --natsumi-primary-color: #ff0000;
+    }
+
+    &:nth-child(n+5) {
+      display: none !important;
+    }
+
+    &[natsumi-notification-animated]:not([natsumi-notification-disappear]) {
+      animation: none !important;
+    }
+
+    &[natsumi-notification-disappear] {
+      animation: notification-disappear 0.3s ease;
+      animation-fill-mode: forwards;
+      pointer-events: none;
+    }
+
+    &[has-icon] {
+      padding-left: 40px !important;
+
+      .natsumi-notification-body::before {
+        content: "";
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        translate: -25px calc(10px - 8pt);
+        -moz-context-properties: stroke, stroke-opacity !important;
+        stroke: light-dark(black, white);
+        background-image: var(--natsumi-notification-icon);
+        background-size: 20px;
+      }
+    }
+
+    .natsumi-notification-subtext {
+      color: light-dark(#777, #aaa);
+      font-size: small;
+    }
+
+    .natsumi-notification-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      margin-top: 6px;
+      gap: 8px;
+
+      .natsumi-notification-button {
+        display: flex;
+        align-items: center;
+        min-height: 32px;
+        border-radius: 16px;
+        padding-inline: 14px;
+        font-size: small;
+        gap: 6px;
+        background-color: var(--natsumi-sdl2-haze-button-idle-color);
+        box-shadow: var(--natsumi-sdl2-haze-button-idle-shadow);
+        color: light-dark(black, white);
+        transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+
+        &:hover {
+          background-color: var(--natsumi-sdl2-haze-button-hover-color) !important;
+        }
+
+        &:active {
+          background-color: var(--natsumi-sdl2-haze-button-active-color) !important;
+          color: light-dark(white, black);
+        }
+
+        @media -moz-pref("natsumi.theme.disable-sdl2") {
+          /* Fallback to SDL1 */
+          background-color: transparent;
+          box-shadow: none;
+
+          &:hover {
+            background-color: var(--natsumi-button-hover-color) !important;
+          }
+
+          &:active {
+            background-color: var(--natsumi-button-active-color) !important;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+            color: light-dark(black, white);
+          }
+        }
+
+        .natsumi-notification-button-icon {
+          min-width: 16px;
+          height: 16px;
+          background-image: var(--natsumi-button-icon);
+          background-size: 16px;
+          -moz-context-properties: stroke, stroke-opacity;
+          stroke: light-dark(black, white);
+        }
+      }
+
+      .natsumi-notification-dismiss {
+        order: 999;
+      }
+    }
+
+    &:not([natsumi-notification-buttons]) {
+      &:hover {
+        .natsumi-notification-body {
+          opacity: 0.1;
+        }
+
+        &::before {
+          opacity: 1;
+        }
+      }
+
+      .natsumi-notification-buttons {
+        display: none !important;
+      }
+    }
+  }
+}
+
+:root[inDOMFullscreen="true"], body[natsumi-compact-mode] {
+  #natsumi-notifications-container {
+    top: 20px !important;
+  }
+}

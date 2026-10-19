@@ -1,0 +1,11 @@
+{
+  "package": {
+    "name": "Natsumi Browser",
+    "author": "Green (@greeeen-dev)",
+    "version": "6.12.4",
+    "version_rc": null,
+    "version_beta": null,
+    "version_alpha": null,
+    "source": "https://github.com/greeeen-dev/natsumi-browser"
+  }
+}

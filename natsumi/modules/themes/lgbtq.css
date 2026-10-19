@@ -1,0 +1,55 @@
+/*
+
+Natsumi Browser - Welcome to your personal internet.
+
+Copyright (c) 2024-present Green (@greeeen-dev)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+/* ==== Theme: LGBTQ+ ==== */
+/* We browse the web with pride 🏳️‍🌈 */
+
+@media -moz-pref("natsumi.theme.type", "lgbtq") {
+  :root[windowtype*="navigator:browser"] body {
+    #browser::before {
+      opacity: var(--natsumi-theme-gradient-opacity) !important;
+      background: linear-gradient(180deg, #ff9393, #ffb78b, #ffe88c, #5ce4a2, #97a6ff, #be9dff) !important;
+
+      @media (prefers-color-scheme: dark) {
+        background: linear-gradient(180deg, #994444, #895f46, #8d804b, #3e8663, #3e456d, #625084) !important;
+      }
+    }
+
+    &::after {
+      background-color: transparent !important;
+    }
+  }
+
+  * {
+    --natsumi-toolbox-color: light-dark(#ff9393, #994444) !important;
+    --natsumi-toolbox-color-inactive: light-dark(#ff9393, #994444) !important;
+    --natsumi-sidebar-color: linear-gradient(180deg, #ff9393, #ffb78b, #ffe88c, #5ce4a2, #97a6ff, #be9dff) !important;
+
+    @media (prefers-color-scheme: dark) {
+      --natsumi-sidebar-color: linear-gradient(180deg, #994444, #895f46, #8d804b, #3e8663, #3e456d, #625084) !important;
+    }
+  }
+}

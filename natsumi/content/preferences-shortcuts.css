@@ -1,0 +1,351 @@
+/*
+
+Natsumi Browser - Welcome to your personal internet.
+
+Copyright (c) 2024-present Green (@greeeen-dev)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+/* ==== Preferences: Shortcuts ==== */
+
+@-moz-document url-prefix(about:settings), url-prefix(about:preferences) {
+  #natsumi-shortcuts .category-icon {
+    list-style-image: url("../icons/lucide/meta.svg");
+    -moz-context-properties: stroke, stroke-opacity !important;
+    stroke: currentColor;
+  }
+
+  #natsumi-shortcut-reset, #natsumi-shortcut-import, #natsumi-shortcut-export {
+    padding-left: 32px;
+    padding-right: 6px;
+    height: 32px;
+    border-radius: 6px;
+    background-color: light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.1));
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    -moz-context-properties: stroke, stroke-opacity;
+    stroke: light-dark(black, white);
+    background-size: 20px;
+    background-position: 6px center;
+    background-repeat: no-repeat;
+    align-items: center;
+    user-select: none;
+
+    &:hover {
+      background-color: light-dark(rgba(0, 0, 0, 0.2), rgba(255, 255, 255, 0.2));
+    }
+
+    &:active {
+      background-color: var(--natsumi-button-active-color);
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  #natsumi-shortcut-reset {
+    margin-inline: auto 10px;
+    background-image: url("../icons/lucide/rotate-right.svg");
+  }
+
+  #natsumi-shortcut-import {
+    margin-right: 10px;
+    background-image: url("../icons/lucide/download.svg");
+  }
+
+  #natsumi-shortcut-export {
+    background-image: url("../icons/lucide/upload.svg");
+  }
+
+  .natsumi-category-header {
+    #natsumi-shortcut-reset {
+      margin-inline: auto 0;
+    }
+
+    #natsumi-shortcut-import {
+      margin-inline: 0;
+    }
+  }
+
+  .natsumi-categorized-shortcuts-container {
+    flex-direction: column !important;
+    gap: 4px;
+  }
+
+  .natsumi-shortcut-row {
+    background-color: light-dark(white, black);
+    border: 1px solid light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.2));
+    border-radius: 6px;
+    flex-direction: column !important;
+    overflow: hidden;
+    min-height: 44px;
+
+    .natsumi-shortcut-info {
+      padding-block: 8px;
+      padding-right: 8px;
+
+      &::before {
+        content: "";
+        width: 4px;
+        height: 42px;
+        margin-block: -8px;
+        margin-right: 8px;
+        background: var(--natsumi-primary-color);
+      }
+    }
+
+    &[natsumi-shortcut-mode="0"] .natsumi-shortcut-info {
+      --natsumi-primary-color: oklch(from #ffffff 0.825 0.1 h);
+    }
+
+    &[natsumi-shortcut-mode="1"] .natsumi-shortcut-info {
+      --natsumi-primary-color: oklch(from blue 0.825 0.1 h);
+    }
+
+    &[natsumi-shortcut-mode="2"] .natsumi-shortcut-info {
+      --natsumi-primary-color: oklch(from green 0.825 0.1 h);
+    }
+
+    &[natsumi-shortcut-mode="3"] .natsumi-shortcut-info {
+      --natsumi-primary-color: oklch(from orange 0.825 0.1 h);
+    }
+
+    &[unassigned] .natsumi-shortcut-info {
+      --natsumi-primary-color: #c5c5c5 !important;
+    }
+
+    .natsumi-shortcut-name {
+      margin: auto 0;
+      pointer-events: none;
+    }
+
+    .natsumi-shortcut-keybind {
+      --natsumi-keybind-color: light-dark(black, white);
+      min-height: 26px;
+      min-width: 100px;
+      margin-left: auto;
+      border-radius: 8px;
+      justify-content: center;
+      border: 1px solid color-mix(in srgb, var(--natsumi-keybind-color) 10%, transparent);
+      background-color: color-mix(in srgb, var(--natsumi-keybind-color) 5%, transparent);
+      cursor: text;
+
+      .natsumi-shortcut-key {
+        min-width: 20px;
+        height: 20px;
+        background-color: white;
+        margin: auto 1px;
+        justify-content: center;
+        padding: 0 4px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        border-bottom: 2px solid #ccc;
+        font-size: 12px;
+        color: black;
+        pointer-events: none;
+
+        &:not([value="key"]) {
+          padding: 0;
+
+          &::before {
+            content: "";
+            width: 12px;
+            height: 12px;
+            margin: auto 0;
+            -moz-context-properties: stroke, stroke-opacity !important;
+            stroke: black;
+            background-size: 12px;
+          }
+        }
+
+        &[value="meta"]::before {
+          background-image: url("../icons/lucide/meta.svg");
+        }
+
+        &[value="shift"]::before {
+          background-image: url("../icons/lucide/shift.svg");
+        }
+
+        &[value="ctrl"]::before {
+          background-image: url("../icons/lucide/arrow-up.svg");
+        }
+
+        &[value="alt"]::before {
+          background-image: url("../icons/lucide/alt.svg");
+        }
+
+        &[value="left"]::before {
+          background-image: url("../icons/lucide/arrowkey-left.svg");
+        }
+
+        &[value="right"]::before {
+          background-image: url("../icons/lucide/arrowkey-right.svg");
+        }
+
+        &[value="up"]::before {
+          background-image: url("../icons/lucide/arrowkey-up.svg");
+        }
+
+        &[value="down"]::before {
+          background-image: url("../icons/lucide/arrowkey-down.svg");
+        }
+
+        &[value="escape"]::before {
+          background-image: url("../icons/lucide/esc.svg");
+        }
+
+        &[value="enter"]::before {
+          background-image: url("../icons/lucide/enter.svg");
+        }
+
+        &[value="back"]::before, &[value="backspace"]::before {
+          background-image: url("../icons/lucide/backspace.svg");
+        }
+
+        &[value="delete"]::before {
+          background-image: url("../icons/lucide/backspace.svg");
+          scale: -1 1;
+        }
+      }
+    }
+
+    .natsumi-shortcut-unassigned {
+      font-size: small;
+      margin: auto 0;
+    }
+
+    .natsumi-shortcut-conflict {
+      display: none;
+      pointer-events: none;
+      flex-direction: column;
+      padding: 10px 8px 8px;
+      border-top: 1px solid light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.1));
+    }
+
+    .natsumi-shortcut-conflict-label {
+      opacity: 0.5;
+      font-size: small;
+    }
+
+    .natsumi-shortcut-conflict-selection {
+      flex-direction: row;
+      margin-top: 4px;
+      gap: 5px;
+
+      .natsumi-shortcut-conflict-item {
+        --natsumi-conflict-item-color: white;
+        flex-direction: column;
+        flex: 1;
+        padding: 7px;
+        border-radius: 8px;
+
+        & > * {
+          pointer-events: none;
+        }
+
+        .natsumi-shortcut-conflict-item-icon {
+          min-width: 36px;
+          max-width: 36px;
+          min-height: 36px;
+          max-height: 36px;
+          margin-top: 5px;
+          border-radius: 6px;
+          background-color: color-mix(in srgb, var(--natsumi-conflict-item-color) 20%, transparent);
+          padding: 6px;
+          -moz-context-properties: stroke, stroke-opacity !important;
+          stroke: var(--natsumi-conflict-item-color);
+          background-image: var(--natsumi-conflict-item-icon);
+          background-size: 24px;
+          background-position: center;
+          background-repeat: no-repeat;
+        }
+
+        .natsumi-shortcut-conflict-item-title, .natsumi-shortcut-conflict-item-description {
+          color: light-dark(color-mix(in srgb, var(--natsumi-conflict-item-color) 50%, black), color-mix(in srgb, var(--natsumi-conflict-item-color) 50%, white))
+        }
+
+        .natsumi-shortcut-conflict-item-title {
+          font-weight: bold;
+          margin: 4px 0;
+        }
+
+        .natsumi-shortcut-conflict-item-description {
+          font-size: small;
+        }
+
+        &[selected] {
+          background: linear-gradient(135deg, light-dark(color-mix(in srgb, var(--natsumi-conflict-item-color) 50%, white), color-mix(in srgb, var(--natsumi-conflict-item-color) 50%, black)), transparent);
+
+          .natsumi-shortcut-conflict-item-icon {
+            --natsumi-conflict-item-color: light-dark(black, white) !important;
+          }
+
+          .natsumi-shortcut-conflict-item-title, .natsumi-shortcut-conflict-item-description {
+            color: light-dark(black, white);
+          }
+        }
+
+        &[value="0"] {
+          --natsumi-conflict-item-color: red;
+          --natsumi-conflict-item-icon: url("../icons/lucide/kbs-browser.svg");
+        }
+
+        &[value="3"] {
+          --natsumi-conflict-item-color: orange;
+          --natsumi-conflict-item-icon: url("../icons/lucide/kbs-website.svg");
+        }
+
+        &[value="2"] {
+          --natsumi-conflict-item-color: green;
+          --natsumi-conflict-item-icon: url("../icons/lucide/kbs-dualrun.svg");
+        }
+
+        &[value="1"] {
+          --natsumi-conflict-item-color: light-dark(blue, lightblue);
+          --natsumi-conflict-item-icon: url("../icons/lucide/kbs-double-tap.svg");
+        }
+      }
+    }
+
+    &[selected] {
+      .natsumi-shortcut-conflict {
+        display: flex;
+        pointer-events: all;
+      }
+
+      &:has(.natsumi-shortcut-conflict-selection[open]) {
+        overflow-y: visible;
+      }
+    }
+
+    &[editing] {
+      .natsumi-shortcut-keybind {
+        border-color: light-dark(color-mix(in srgb, var(--natsumi-primary-color) 70%, black), var(--natsumi-primary-color));
+        background-color: color-mix(in srgb, var(--natsumi-primary-color) 33%, transparent);
+      }
+    }
+  }
+
+  #natsumiKBSFloorpWarning {
+    display: none;
+  }
+
+  body[natsumi-preferences-redesign-v2] groupbox[data-category="paneNatsumiShortcuts"] h2 {
+    font-size: var(--font-size-large) !important;
+  }
+}

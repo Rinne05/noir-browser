@@ -1,0 +1,83 @@
+/*
+
+Natsumi Browser - Welcome to your personal internet.
+
+Copyright (c) 2024-present Green (@greeeen-dev)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+/* ==== Load config and Natsumi Browser ==== */
+
+/*
+WARNING: DO NOT TOUCH THIS FILE UNLESS YOU KNOW WHAT YOU ARE DOING.
+Removing or modifying parts of this file may break some parts of Natsumi.
+*/
+
+/* Setup (config and global modules) */
+@import "../natsumi-config.css";
+@import "modules/preload.css";
+@import "global/colors.css";
+@import "global/starlight.css";
+
+/* Base modules */
+@import "modules/themer.css";
+@import "modules/base.css";
+@import "modules/dialog.css";
+@import "modules/backdrop-blur.css";
+@import "modules/single-toolbar.css";
+@import "modules/tabs.css";
+@import "modules/folders.css";
+@import "modules/urlbar.css";
+@import "modules/findbar.css";
+@import "modules/pip.css";
+@import "modules/miniplayer.css";
+@import "modules/notifications.css";
+@import "modules/right-sidebar.css";
+@import "modules/compact-mode.css";
+@import "modules/glimpse.css";
+@import "modules/welcome.css";
+@import "modules/startup.css";
+@import "modules/updater.css";
+@import "modules/customize.css";
+@import "modules/toolbars.css";
+@import "modules/experiments.css";
+@import "modules/nova-patches.css";
+@import "modules/icons.css";
+
+/* Floorp-specific modules */
+@import "modules/floorp/patches.css";
+@import "modules/floorp/themer.css";
+@import "modules/floorp/base.css";
+@import "modules/floorp/status-bar.css";
+@import "modules/floorp/split-view.css";
+@import "modules/floorp/panel-sidebar.css";
+@import "modules/floorp/workspaces.css";
+@import "modules/floorp/right-sidebar.css";
+@import "modules/floorp/compact-mode.css";
+@import "modules/floorp/webapps.css";
+@import "modules/floorp/command-palette.css";
+
+/* Waterfox-specific modules */
+@import "modules/waterfox/base.css";
+@import "modules/waterfox/status-bar.css";
+
+/* Finish setup */
+@import "modules/postload.css";

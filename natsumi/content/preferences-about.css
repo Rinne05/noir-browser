@@ -1,0 +1,224 @@
+/*
+
+Natsumi Browser - Welcome to your personal internet.
+
+Copyright (c) 2024-present Green (@greeeen-dev)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+/* ==== Preferences: About ==== */
+
+@keyframes natsumi-loading {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@-moz-document url-prefix(about:settings), url-prefix(about:preferences) {
+  #natsumi-about .category-icon {
+    list-style-image: url("../icons/lucide/info.svg");
+    -moz-context-properties: stroke, stroke-opacity !important;
+    stroke: currentColor;
+  }
+
+  button:has(.page-nav-icon[src*="lucide/info.svg"]) {
+    img {
+      display: none !important;
+    }
+
+    &::after {
+      content: "";
+      background: currentColor;
+      min-width: 16px;
+      height: 16px;
+      order: -1;
+      mask-image: url("../icons/custom/natsumi-mask.png");
+      mask-size: 18px;
+      mask-position: center;
+    }
+  }
+
+  #natsumi-about-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+
+  #natsumi-about-box {
+    background-color: var(--natsumi-mat-th-background);
+    backdrop-filter: var(--natsumi-mat-th-backdrop);
+    border: var(--natsumi-mat-th-border-thin);
+    box-shadow: var(--natsumi-mat-th-shadow);
+    border-radius: 24px;
+    width: 100%;
+  }
+
+  #natsumi-about-info-container {
+    flex-direction: column;
+    gap: 5px;
+    margin-block: 12px;
+  }
+
+  #natsumi-about-icon {
+    width: 128px;
+    height: 128px;
+    background-image: url("../icons/natsumi-glass.png");
+    background-size: 128px;
+
+    @media -moz-pref("natsumi.theme.pride") {
+      background-image: url("../icons/natsumi-pride.png");
+    }
+  }
+
+  #natsumi-about-container[stardust="true"] #natsumi-about-icon {
+    background-image: url("../icons/natsumi-stardust.png") !important;
+  }
+
+  #natsumi-about-name {
+    font-size: xx-large;
+    font-weight: bold;
+  }
+
+  #natsumi-about-version {
+    margin: auto 0;
+  }
+
+  #natsumi-about-version, #natsumi-about-browser-version {
+    font-size: medium;
+    font-family: monospace;
+    opacity: 0.7;
+  }
+
+  #natsumi-about-version-container {
+    max-height: 24px;
+  }
+
+  #natsumi-about-stability-badge {
+    height: 24px;
+    margin-left: 6px;
+    background-color: orange;
+    border-radius: 6px;
+
+    &::before {
+      content: "";
+      width: 16px;
+      height: 16px;
+      margin-block: auto;
+      margin-left: 4px;
+      background-image: url("../icons/lucide/experimental.svg");
+      -moz-context-properties: stroke, stroke-opacity !important;
+      stroke: black;
+      background-size: 16px;
+    }
+
+    &::after {
+      content: "Unstable";
+      margin: auto 4px;
+      font-size: small;
+      color: black;
+    }
+  }
+
+  #natsumi-about-mission {
+    text-align: center;
+  }
+
+  .natsumi-about-vertical-separator {
+    width: calc(100% - 40px);
+    height: 1px;
+    margin: 10px 0;
+    border-top: 1px dashed light-dark(black, white);
+    opacity: 0.5;
+  }
+
+  #natsumi-about-links-container {
+    gap: 10px;
+  }
+
+  #natsumi-about-updater {
+    align-items: center;
+    min-height: 32px;
+    gap: 6px;
+    user-select: none !important;
+
+    #natsumi-about-updater-icon {
+      width: 20px;
+      height: 20px;
+      background-image: url("../icons/lucide/check.svg");
+      background-size: 20px;
+      -moz-context-properties: stroke, stroke-opacity !important;
+      stroke: light-dark(black, white);
+      margin-right: -2px !important;
+    }
+
+    #natsumi-about-updater-button {
+      --natsumi-content-color: light-dark(var(--natsumi-colors-primary), var(--natsumi-primary-color));
+      height: 32px;
+      align-items: center;
+      border-radius: 16px;
+      background-color: var(--natsumi-content-color);
+      padding-inline: 12px;
+      color: light-dark(white, black);
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: color-mix(in srgb, var(--natsumi-content-color) 70%, transparent);
+      }
+
+      &:active {
+        background-color: color-mix(in srgb, var(--natsumi-content-color) 50%, transparent);
+      }
+    }
+
+    &[natsumi-update-available] {
+      #natsumi-about-updater-icon, #natsumi-about-updater-status {
+        display: none;
+      }
+    }
+
+    &[natsumi-update-checking] {
+      #natsumi-about-updater-button {
+        display: none;
+      }
+
+      #natsumi-about-updater-icon {
+        background-image: url("../icons/lucide/loading.svg") !important;
+        animation: natsumi-loading 1s linear infinite;
+      }
+    }
+
+    &[natsumi-update-disabled] {
+      #natsumi-about-updater-icon, #natsumi-about-updater-button {
+        display: none;
+      }
+    }
+
+    &[natsumi-update-failed] {
+      #natsumi-about-updater-icon {
+        background-image: url("../icons/lucide/close.svg") !important;
+      }
+    }
+  }
+}

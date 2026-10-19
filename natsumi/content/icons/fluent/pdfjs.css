@@ -1,0 +1,198 @@
+/*
+
+Natsumi Browser - Welcome to your personal internet.
+
+Copyright (c) 2024-present Green (@greeeen-dev)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+/* ==== Microsoft Fluent UI icons for PDF viewer ==== */
+
+@media not -moz-pref("natsumi.pdfjs.disabled") {
+  html[mozdisallowselectionprint] {
+    &:has(head link:nth-of-type(1)[href^="resource://pdf.js"]) {
+      @media -moz-pref("natsumi.theme.icons", "fluent") {
+        .toolbarButton::before {
+          stroke: unset !important;
+          fill: black;
+
+          @media (prefers-color-scheme: dark) {
+            fill: white;
+          }
+        }
+
+        #previous::before {
+          mask-image: url('../../../icons/fluent/arrow-up.svg') !important;
+        }
+
+        #next::before {
+          mask-image: url('../../../icons/fluent/arrow-down.svg') !important;
+        }
+
+        #zoomOutButton::before {
+          mask-image: url('../../../icons/fluent/minus.svg') !important;
+        }
+
+        #zoomInButton::before {
+          mask-image: url('../../../icons/fluent/plus.svg') !important;
+        }
+
+        #sidebarToggleButton::before {
+          mask-image: url('../../../icons/fluent/sidebar.svg') !important;
+        }
+
+        #editorCommentButton::before {
+          mask-image: url('../../../icons/fluent/comment.svg') !important;
+        }
+
+        #editorSignatureButton::before {
+          mask-image: url('../../../icons/fluent/sign.svg') !important;
+        }
+
+        #editorHighlightButton::before {
+          mask-image: url('../../../icons/fluent/highlighter.svg') !important;
+        }
+
+        #editorFreeTextButton::before {
+          mask-image: url('../../../icons/fluent/text.svg') !important;
+        }
+
+        #editorInkButton::before {
+          mask-image: url('../../../icons/fluent/pen.svg') !important;
+        }
+
+        #editorStampButton::before {
+          mask-image: url('../../../icons/fluent/image-plus.svg') !important;
+        }
+
+        #secondaryPrint::before, #printButton::before {
+          mask-image: url('../../../icons/fluent/printer.svg') !important;
+        }
+
+        #secondaryDownload::before, #downloadButton::before {
+          mask-image: url('../../../icons/fluent/save.svg') !important;
+        }
+
+        #presentationMode::before {
+          mask-image: url('../../../icons/fluent/presentation.svg') !important;
+        }
+
+        #viewBookmark::before {
+          mask-image: url('../../../icons/fluent/page.svg') !important;
+        }
+
+        #firstPage::before {
+          mask-image: url('../../../icons/fluent/arrow-up.svg') !important;
+        }
+
+        #lastPage::before {
+          mask-image: url('../../../icons/fluent/arrow-down.svg') !important;
+        }
+
+        #pageRotateCw::before {
+          mask-image: url('../../../icons/fluent/rotate-left.svg') !important;
+        }
+
+        #pageRotateCcw::before {
+          mask-image: url('../../../icons/fluent/rotate-right.svg') !important;
+        }
+
+        #cursorSelectTool::before {
+          mask-image: url('../../../icons/fluent/cursor.svg') !important;
+        }
+
+        #cursorHandTool::before {
+          mask-image: url('../../../icons/fluent/hand.svg') !important;
+        }
+
+        #scrollPage::before {
+          mask-image: url('resource://pdf.js/web/images/secondaryToolbarButton-scrollPage.svg') !important;
+        }
+
+        #scrollVertical::before {
+          mask-image: url('resource://pdf.js/web/images/secondaryToolbarButton-scrollVertical.svg') !important;
+        }
+
+        #scrollHorizontal::before {
+          mask-image: url('resource://pdf.js/web/images/secondaryToolbarButton-scrollHorizontal.svg') !important;
+        }
+
+        #scrollWrapped::before {
+          mask-image: url('resource://pdf.js/web/images/secondaryToolbarButton-scrollWrapped.svg') !important;
+        }
+
+        #spreadNone::before {
+          mask-image: url('resource://pdf.js/web/images/secondaryToolbarButton-spreadNone.svg') !important;
+        }
+
+        #spreadOdd::before {
+          mask-image: url('resource://pdf.js/web/images/secondaryToolbarButton-spreadOdd.svg') !important;
+        }
+
+        #spreadEven::before {
+          mask-image: url('resource://pdf.js/web/images/secondaryToolbarButton-spreadEven.svg') !important;
+        }
+
+        #imageAltTextSettings::before {
+          mask-image: url('../../../icons/fluent/image.svg') !important;
+        }
+
+        #documentProperties::before {
+          mask-image: url('../../../icons/fluent/info.svg') !important;
+        }
+
+        #editorStampAddImage::before {
+          mask-image: url('../../../icons/fluent/plus.svg') !important;
+        }
+
+        #secondaryToolbarToggleButton::before {
+          mask-image: url('../../../icons/fluent/arrow-right.svg') !important;
+        }
+
+        /* Sidebar buttons */
+        #viewThumbnail::before {
+          mask-image: url('../../../icons/fluent/grid.svg') !important;
+        }
+
+        #viewOutline::before {
+          mask-image: url('../../../icons/fluent/list.svg') !important;
+        }
+
+        #viewAttachments::before {
+          mask-image: url('../../../icons/fluent/attachments.svg') !important;
+        }
+
+        #viewLayers::before {
+          mask-image: url('../../../icons/fluent/stack.svg') !important;
+        }
+
+        #currentOutlineItem::before {
+          mask-image: url('resource://pdf.js/web/images/toolbarButton-currentOutlineItem.svg') !important;
+        }
+
+        /* Checked buttons */
+        #secondaryToolbarButtonContainer .toolbarButton[aria-checked="true"]::before {
+          mask-image: url('../../../icons/fluent/check.svg') !important;
+        }
+      }
+    }
+  }
+}

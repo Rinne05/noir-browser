@@ -1,0 +1,497 @@
+/*
+
+Natsumi Browser - Welcome to your personal internet.
+
+Copyright (c) 2024-present Green (@greeeen-dev)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+/* ==== Lucide icons for browser ==== */
+
+@media -moz-pref("natsumi.theme.icons", "lucide") {
+  /* Toolbar icons */
+  toolbarbutton:not(#appMenu-zoomReduce-button2, #appMenu-zoomEnlarge-button2) .toolbarbutton-icon, #fxa-avatar-image, .searchbar-search-icon {
+    -moz-context-properties: stroke, fill, fill-opacity, stroke-opacity !important;
+    stroke: var(--toolbarbutton-icon-fill) !important;
+  }
+
+  .searchbar-search-icon {
+    stroke-opacity: var(--urlbar-icon-fill-opacity) !important;
+  }
+
+  #sidebar-button {
+    list-style-image: url("../../../icons/lucide/sidebar.svg") !important;
+  }
+
+  #back-button {
+    list-style-image: url("../../../icons/lucide/arrow-left.svg") !important;
+  }
+
+  #forward-button {
+    list-style-image: url("../../../icons/lucide/arrow-right.svg") !important;
+  }
+
+  @media -moz-pref("natsumi.theme.icons-alt-back-forward") {
+    #back-button {
+      list-style-image: url("../../../icons/lucide/arrow-left-alt.svg") !important;
+    }
+
+    #forward-button {
+      list-style-image: url("../../../icons/lucide/arrow-right-alt.svg") !important;
+    }
+  }
+
+  #reload-button {
+    list-style-image: url("../../../icons/lucide/rotate-right.svg") !important;
+  }
+
+  #fxa-avatar-image {
+    list-style-image: var(--avatar-image-url, url("../../../icons/lucide/profile.svg")) !important;
+  }
+
+  #unified-extensions-button {
+    list-style-image: url("../../../icons/lucide/addons.svg") !important;
+  }
+
+  #alltabs-button {
+    list-style-image: url("../../../icons/lucide/tabs-list.svg") !important;
+  }
+
+  #firefox-view-button {
+    list-style-image: url("../../../icons/lucide/firefox-view.svg") !important;
+  }
+
+  #history-panelmenu {
+    list-style-image: url("../../../icons/lucide/history.svg") !important;
+  }
+
+  #save-page-button {
+    list-style-image: url("../../../icons/lucide/save.svg") !important;
+  }
+
+  #print-button {
+    list-style-image: url("../../../icons/lucide/printer.svg") !important;
+  }
+
+  #find-button {
+    list-style-image: url("../../../icons/lucide/find.svg") !important;
+  }
+
+  #open-file-button {
+    list-style-image: url("../../../icons/lucide/folder-open.svg") !important;
+  }
+
+  #zoom-out-button {
+    list-style-image: url("../../../icons/lucide/minus.svg") !important;
+  }
+
+  #zoom-in-button {
+    list-style-image: url("../../../icons/lucide/plus.svg") !important;
+  }
+
+  #cut-button {
+    list-style-image: url("../../../icons/lucide/cut.svg") !important;
+  }
+
+  #copy-button {
+    list-style-image: url("../../../icons/lucide/copy.svg") !important;
+  }
+
+  #paste-button {
+    list-style-image: url("../../../icons/lucide/paste.svg") !important;
+  }
+
+  #email-link-button {
+    list-style-image: url("../../../icons/lucide/mail.svg") !important;
+  }
+
+  #logins-button {
+    list-style-image: url("../../../icons/lucide/passwords.svg") !important;
+  }
+
+  #sync-button {
+    list-style-image: url("../../../icons/lucide/devices.svg") !important;
+  }
+
+  #preferences-button {
+    list-style-image: url("../../../icons/lucide/settings.svg") !important;
+  }
+
+  #panic-button {
+    list-style-image: url("../../../icons/lucide/panic.svg") !important;
+  }
+
+  #privatebrowsing-button {
+    list-style-image: url("../../../icons/lucide/private-window.svg") !important;
+  }
+
+  #undo-closed-tab {
+    list-style-image: url("../../../icons/lucide/undo.svg") !important;
+  }
+
+  #developer-button {
+    list-style-image: url("../../../icons/lucide/developer.svg") !important;
+  }
+
+  #new-window-button {
+    list-style-image: url("../../../icons/lucide/window.svg") !important;
+  }
+
+  #bookmarks-menu-button {
+    list-style-image: url("../../../icons/lucide/bookmarks.svg") !important;
+  }
+
+  .searchbar-search-icon {
+    list-style-image: url("../../../icons/lucide/search.svg") !important;
+  }
+
+  #home-button {
+    list-style-image: url("../../../icons/lucide/house.svg") !important;
+  }
+
+  #library-button {
+    list-style-image: url("../../../icons/lucide/library.svg") !important;
+  }
+
+  #new-tab-button {
+    list-style-image: url("../../../icons/lucide/plus.svg") !important;
+  }
+
+  body:not([natsumi-compact-mode]) #zen-mode-button {
+    list-style-image: url("../../../icons/lucide/compact-mode.svg") !important;
+  }
+
+  body[natsumi-compact-mode] #zen-mode-button {
+    list-style-image: url("../../../icons/lucide/compact-mode-disable.svg") !important;
+  }
+
+  #screenshot-button {
+    list-style-image: url("../../../icons/lucide/screenshot.svg") !important;
+  }
+
+  #fullscreen-button {
+    list-style-image: url("../../../icons/lucide/fullscreen.svg") !important;
+  }
+
+  #new-identity-button {
+    list-style-image: url("../../../icons/lucide/identity.svg") !important;
+  }
+
+  /* URLbar icons */
+  #identity-icon, .urlbar-icon, #tracking-protection-icon {
+    -moz-context-properties: stroke, fill, fill-opacity, stroke-opacity !important;
+    stroke: currentColor;
+    stroke-opacity: var(--urlbar-icon-fill-opacity);
+  }
+
+  #identity-box.notSecure #identity-icon {
+    stroke: red;
+    list-style-image: url("../../../icons/lucide/unsecure.svg") !important;
+  }
+
+  #identity-box.verifiedDomain #identity-icon {
+    list-style-image: url("../../../icons/lucide/secure.svg") !important;
+  }
+
+  #identity-box.localResource #identity-icon {
+    list-style-image: url("../../../icons/lucide/file.svg") !important;
+  }
+
+  #reader-mode-button-icon {
+    list-style-image: url("../../../icons/lucide/reader-view.svg") !important;
+  }
+
+  #reader-mode-button[readeractive] #reader-mode-button-icon {
+    stroke: light-dark(var(--natsumi-colors-primary), var(--natsumi-primary-color));
+  }
+
+  #picture-in-picture-button-icon {
+    list-style-image: url("../../../icons/lucide/pip.svg") !important;
+  }
+
+  #ssbPageAction-image {
+    list-style-image: url("../../../icons/lucide/pwa-download.svg") !important;
+  }
+
+  #QRCodeGeneratePageAction {
+    list-style-image: url("../../../icons/lucide/send.svg") !important;
+  }
+
+  #star-button {
+    list-style-image: url("../../../icons/lucide/bookmark.svg") !important;
+  }
+
+  #star-button[starred] {
+    stroke: var(--natsumi-colors-primary);
+    list-style-image: url("../../../icons/lucide/bookmark-check.svg") !important;
+
+    @media (prefers-color-scheme: dark) {
+      stroke: var(--natsumi-primary-color);
+    }
+  }
+
+  #tracking-protection-icon-box {
+    background: var(--toolbarbutton-icon-fill);
+    mask-image: url("../../../icons/lucide/shield-filled.svg");
+    mask-size: 100%;
+
+    &[active] {
+      background: linear-gradient(45deg, light-dark(#0000ff, #7777ff), light-dark(#cc00ff, #dd57ff)) !important;
+    }
+  }
+
+  #tracking-protection-icon {
+    list-style-image: none !important;
+  }
+
+  #splitView-image {
+    stroke: var(--natsumi-colors-primary);
+    list-style-image: url("../../../icons/lucide/split-view.svg") !important;
+
+    @media (prefers-color-scheme: dark) {
+      stroke: var(--natsumi-primary-color);
+    }
+  }
+
+  #urlbar-revert-button-container .urlbar-icon {
+    -moz-context-properties: stroke, fill, fill-opacity, stroke-opacity !important;
+    stroke: var(--toolbarbutton-icon-fill-attention) !important;
+    list-style-image: url("../../../icons/lucide/globe.svg") !important;
+  }
+
+  #urlbar[open] .urlbar-input-container::before {
+    fill: unset !important;
+    stroke: light-dark(black, white);
+    background-image: url("../../../icons/lucide/search.svg") !important;
+  }
+
+  /* Permissions icons */
+
+  #permissions-granted-icon, #identity-permission-box .sharing-icon, #blocked-permissions-container > .blocked-permission-icon {
+    -moz-context-properties: stroke, fill, fill-opacity, stroke-opacity !important;
+    stroke: currentColor;
+    stroke-opacity: var(--urlbar-icon-fill-opacity);
+  }
+
+  #geo-sharing-icon {
+    list-style-image: url("../../../icons/lucide/location.svg") !important;
+  }
+
+  #webrtc-sharing-icon {
+    stroke: rgb(224, 41, 29) !important;
+
+    &[sharing="camera"] {
+      list-style-image: url("../../../icons/lucide/camera.svg") !important;
+    }
+
+    &[sharing="microphone"] {
+      list-style-image: url("../../../icons/lucide/mic.svg") !important;
+    }
+
+    &[sharing="screen"] {
+      list-style-image: url("../../../icons/lucide/screenshare.svg") !important;
+    }
+  }
+
+  #permissions-granted-icon {
+    list-style-image: url("../../../icons/lucide/permissions.svg") !important;
+  }
+
+  #blocked-permissions-container .geo-icon {
+    list-style-image: url("../../../icons/lucide/location-off.svg") !important;
+  }
+
+  #blocked-permissions-container .desktop-notification-icon {
+    list-style-image: url("../../../icons/lucide/notifications-off.svg") !important;
+  }
+
+  #blocked-permissions-container .camera-icon {
+    list-style-image: url("../../../icons/lucide/camera-off.svg") !important;
+  }
+
+  #blocked-permissions-container .microphone-icon {
+    list-style-image: url("../../../icons/lucide/mic-off.svg") !important;
+  }
+
+  #blocked-permissions-container .screen-icon {
+    list-style-image: url("../../../icons/lucide/screenshare-off.svg") !important;
+  }
+
+  #blocked-permissions-container .persistent-storage-icon {
+    list-style-image: url("../../../icons/lucide/storage-off.svg") !important;
+  }
+
+  /* Menu button */
+  #PanelUI-menu-button {
+    list-style-image: url("../../../icons/lucide/menu.svg") !important;
+  }
+
+  /* Side panels icons */
+  #panel-sidebar-header .toolbarbutton-icon {
+    -moz-context-properties: stroke, fill, fill-opacity, stroke-opacity !important;
+    stroke: var(--toolbarbutton-icon-fill) !important;
+    width: 16px !important;
+  }
+
+  #panel-sidebar-back {
+    list-style-image: url("../../../icons/lucide/arrow-left.svg") !important;
+  }
+
+  #panel-sidebar-forward {
+    list-style-image: url("../../../icons/lucide/arrow-right.svg") !important;
+  }
+
+  #panel-sidebar-reload {
+    list-style-image: url("../../../icons/lucide/rotate-right.svg") !important;
+  }
+
+  #panel-sidebar-go-index {
+    list-style-image: url("../../../icons/lucide/house.svg") !important;
+  }
+
+  #panel-sidebar-float {
+    list-style-image: url("../../../icons/lucide/minus.svg") !important;
+  }
+
+  #panel-sidebar-box[data-floating="true"] #panel-sidebar-float {
+    list-style-image: url("../../../icons/lucide/pin.svg") !important;
+  }
+
+  #panel-sidebar-open-in-main-window {
+    list-style-image: url("../../../icons/lucide/open-in-tab.svg") !important;
+  }
+
+  #panel-sidebar-close {
+    list-style-image: url("../../../icons/lucide/close.svg") !important;
+  }
+
+  /* Tab groups */
+  tab-group .tab-group-label::before {
+    mask-image: url("../../../icons/lucide/folder-open-filled.svg") !important;
+  }
+
+  tab-group[collapsed] .tab-group-label::before {
+    mask-image: url("../../../icons/lucide/folder-filled.svg") !important;
+  }
+
+  /* Tab close button */
+  #tabbrowser-tabs[expanded] #tabbrowser-arrowscrollbox {
+    .tabbrowser-tab .tab-close-button {
+      --natsumi-tab-close-button-padding: 4px;
+      list-style-image: url("../../../icons/lucide/close.svg") !important;
+      -moz-context-properties: stroke, stroke-opacity !important;
+      stroke: currentColor !important;
+    }
+  }
+
+  /* Tab mute button */
+  .tab-audio-button {
+    --natsumi-button-icon: url("chrome://natsumi/content/icons/lucide/volume.svg");
+    --natsumi-button-icon-muted: url("chrome://natsumi/content/icons/lucide/volume-off.svg");
+    --natsumi-button-fill: none;
+    --natsumi-button-stroke: light-dark(black, white);
+  }
+}
+
+@media (not -moz-pref("natsumi.pip.disabled")) and -moz-pref("natsumi.theme.icons", "lucide") {
+  @-moz-document url("chrome://global/content/pictureinpicture/player.xhtml") {
+    .center-controls, .end-controls {
+      button {
+        -moz-context-properties: stroke, fill, fill-opacity, stroke-opacity !important;
+        stroke: light-dark(black, white) !important;
+        background-size: 18px !important;
+      }
+    }
+
+    #close, #unpip {
+      -moz-context-properties: stroke, fill, fill-opacity, stroke-opacity !important;
+      stroke: light-dark(black, white) !important;
+
+      &::before {
+        background-size: 18px !important;
+      }
+    }
+
+    #playpause {
+      background-image: url("../../../icons/lucide/play.svg") !important;
+    }
+
+    .playing #playpause {
+      background-image: url("../../../icons/lucide/pause.svg") !important;
+    }
+
+    #seekBackward, #seekForward {
+      &::before {
+        content: "5";
+        font-size: 8px;
+        position: relative !important;
+        top: -2px !important;
+        color: light-dark(black, white) !important;
+      }
+
+      &:hover::before {
+        top: 5px !important;
+      }
+    }
+
+    #seekBackward {
+      background-image: url("../../../icons/lucide/rotate-left.svg") !important;
+    }
+
+    #seekForward {
+      background-image: url("../../../icons/lucide/rotate-right.svg") !important;
+    }
+
+    #audio {
+      background-image: url("../../../icons/lucide/volume.svg") !important;
+    }
+
+    .muted #audio {
+      background-image: url("../../../icons/lucide/volume-off.svg") !important;
+    }
+
+    #fullscreen {
+      background-image: url("../../../icons/lucide/fullscreen.svg") !important;
+    }
+
+    body:fullscreen #fullscreen {
+      background-image: url("../../../icons/lucide/fullscreen-exit.svg") !important;
+    }
+
+    #closed-caption {
+      background-image: url("../../../icons/lucide/captions.svg") !important;
+
+      @media -moz-pref("natsumi.theme.disable-sdl2") {
+        &[disabled="true"] {
+          stroke: light-dark(#999, #777) !important;
+        }
+      }
+    }
+
+    #close {
+      background-image: url("../../../icons/lucide/close.svg") !important;
+    }
+
+    #unpip {
+      background-image: url("../../../icons/lucide/pip-exit.svg") !important;
+    }
+  }
+}

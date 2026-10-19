@@ -1,0 +1,577 @@
+/*
+
+Natsumi Browser - Welcome to your personal internet.
+
+Copyright (c) 2024-present Green (@greeeen-dev)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+/* ==== Picture-in-picture ==== */
+
+@media not -moz-pref("natsumi.pip.disabled") {
+  @-moz-document url("chrome://global/content/pictureinpicture/player.xhtml") {
+    /*noinspection CssInvalidFunction*/
+
+    @keyframes pip-fadein-html {
+      0% {
+        background-color: transparent;
+        scale: 0.8;
+      }
+
+      99% {
+        background-color: transparent;
+        scale: 1;
+      }
+
+      100% {
+        background-color: black;
+      }
+    }
+
+    @keyframes pip-fadein-player {
+      0% {
+        filter: blur(30px);
+        opacity: 0;
+      }
+
+      70% {
+        filter: blur(5px);
+      }
+
+      100% {
+        filter: blur(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes pip-live-flash {
+      0% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+
+    @media -moz-pref("natsumi.pip.rounded") {
+      /* This won't work on Linux (sadly), might be just a Gnome thing. */
+      /* If you're seeing this, create an issue if it does indeed work */
+
+      @media (-moz-platform: windows) {
+        window, html, body {
+          /* Share same radius as macOS for the sake of simplicity later */
+          border-radius: 9px !important;
+          background: transparent !important;
+        }
+      }
+    }
+
+    /* Set material */
+    * {
+      --natsumi-material-background: var(--natsumi-mat-hz-background);
+      --natsumi-material-backdrop: var(--natsumi-mat-hz-backdrop);
+      --natsumi-material-border: var(--natsumi-mat-hz-border);
+      --natsumi-material-border-thin: var(--natsumi-mat-hz-border-thin);
+      --natsumi-material-shadow: var(--natsumi-mat-hz-shadow);
+
+      @media -moz-pref("natsumi.pip.material", "tinted-haze") {
+        --natsumi-material-background: var(--natsumi-mat-th-background);
+      }
+
+      @media -moz-pref("natsumi.pip.material", "solid") {
+        --natsumi-material-background: var(--natsumi-mat-sd-background);
+        --natsumi-material-backdrop: none;
+        --natsumi-material-border: var(--natsumi-mat-sd-border);
+        --natsumi-material-border-thin: var(--natsumi-mat-sd-border);
+        --natsumi-material-shadow: var(--natsumi-mat-sd-shadow);
+      }
+    }
+
+    body[style*="--natsumi-custom-font"] * {
+      font-family: var(--natsumi-custom-font) !important;
+    }
+
+    html {
+      animation: pip-fadein-html 0.5s ease !important;
+    }
+
+    body[natsumi-scrolling] {
+      cursor: none !important;
+
+      * {
+        cursor: none !important;
+      }
+    }
+
+    .player-holder {
+      animation: pip-fadein-player 0.5s ease !important;
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    }
+
+    #controls {
+      opacity: 1 !important;
+
+      #controls-bottom-gradient {
+        opacity: 0 !important;
+        transition: opacity 0.2s ease !important;
+      }
+
+      /*noinspection CssInvalidFunction*/
+      & > button {
+        opacity: 0 !important;
+        top: 0 !important;
+        border-radius: 50% !important;
+        transition: opacity 0.3s ease, top 0.3s ease, background-color 0.2s ease, box-shadow 0.2s ease !important;
+        backdrop-filter: var(--natsumi-material-backdrop) !important;
+        background-color: var(--natsumi-material-background) !important;
+        box-shadow: var(--natsumi-material-shadow) !important;
+        background-size: 16px !important;
+        border: var(--natsumi-material-border) !important;
+
+        @media -moz-pref("natsumi.theme.disable-sdl2") {
+          &:hover {
+            background-color: color-mix(in srgb, var(--natsumi-material-background) 70%, white) !important;
+          }
+
+          &:active {
+            background-color: var(--natsumi-button-active-color) !important;
+          }
+        }
+
+        @media not -moz-pref("natsumi.theme.disable-sdl2") {
+          min-width: 40px !important;
+          height: 40px !important;
+          padding: 2px !important;
+          background-size: 0 !important;
+
+          &::before {
+            content: "";
+            width: 32px;
+            height: 32px;
+            position: absolute;
+            border-radius: 50%;
+            left: 2px;
+            top: 2px;
+            background-image: inherit;
+            background-size: 16px;
+            background-repeat: no-repeat;
+            background-position: center;
+            box-shadow: var(--natsumi-sdl2-haze-button-idle-shadow);
+            background-color: var(--natsumi-sdl2-haze-button-idle-color);
+            transition: background-color 0.2s ease;
+          }
+
+          &:hover::before {
+            background-color: var(--natsumi-sdl2-haze-button-hover-color);
+          }
+
+          &:active::before {
+            background-color: var(--natsumi-sdl2-haze-button-active-color);
+          }
+        }
+      }
+
+      #close, #unpip {
+        -moz-context-properties: fill;
+        fill: light-dark(black, white) !important;
+      }
+
+      /*noinspection CssInvalidFunction*/
+      #controls-bottom {
+        opacity: 0 !important;
+        bottom: -5px !important;
+        padding: 10px 15px !important;
+        margin: 0 5px !important;
+        margin-bottom: 5px !important;
+        width: calc(100% - 10px) !important;
+        box-sizing: border-box !important;
+        transition: opacity 0.3s ease, bottom 0.3s ease !important;
+        left: calc(50% - 5px) !important;
+        transform: translateX(-50%) !important;
+
+        .start-controls, .center-controls, .end-controls {
+          border-radius: 18px !important;
+          background-color: var(--natsumi-material-background) !important;
+          border: var(--natsumi-material-border) !important;
+          backdrop-filter: var(--natsumi-material-backdrop) !important;
+          gap: 0 !important;
+          box-shadow: var(--natsumi-material-shadow) !important;
+
+          @media not -moz-pref("natsumi.theme.disable-sdl2") {
+            padding: 2px !important;
+            border-radius: 20px !important;
+            gap: 4px !important;
+          }
+        }
+
+        #timestamp {
+          text-align: center !important;
+          width: 100% !important;
+          padding-inline: 12px !important;
+        }
+
+        @media -moz-pref("natsumi.theme.disable-sdl2") {
+          #seekBackward, #audio {
+            border-radius: 16px 4px 4px 16px !important;
+          }
+
+          #playpause, #closed-caption {
+            border-radius: 4px !important;
+          }
+
+          #seekForward, #fullscreen {
+            border-radius: 4px 16px 16px 4px !important;
+          }
+        }
+
+        #playpause::after, #seekBackward::after, #seekForward::after, #audio::after, #closed-caption::after {
+          left: 50% !important;
+          translate: -50% 0 !important;
+        }
+
+        #seekForward::after, #seekBackward::after {
+          top: -54.5px !important;
+        }
+
+        .start-controls {
+          @media (width > 300px) {
+            display: flex !important;
+          }
+
+          @media (width <= 440px) {
+            border-width: 0 !important;
+          }
+
+          /*noinspection CssInvalidFunction*/
+          #timestamp {
+            font-size: 12px !important;
+            color: light-dark(black, white) !important;
+          }
+
+          #natsumi-live-indicator {
+            display: none;
+          }
+
+          &:has(#timestamp[hidden]) #natsumi-live-indicator {
+            display: flex;
+            align-items: center;
+            padding-inline: 12px 12px;
+            font-family: system-ui;
+            font-size: 0.9em;
+            user-select: none;
+
+            &::before {
+              content: "";
+              background: red;
+              width: 10px;
+              height: 10px;
+              border-radius: 5px;
+              margin-right: 6px;
+              animation: pip-live-flash 2s steps(1, start) infinite;
+            }
+          }
+        }
+
+        .center-controls {
+          &:has(#seekBackward[hidden]):has(#seekForward[hidden]) {
+            display: flex !important;
+            width: 32px !important;
+          }
+        }
+
+        .end-controls {
+          display: flex !important;
+        }
+
+        #scrubber, #audio-scrubber {
+          margin: 0 !important;
+
+          /*noinspection CssInvalidFunction*/
+          &::-moz-range-progress {
+            background: light-dark(var(--natsumi-colors-primary), var(--natsumi-primary-color)) !important;
+          }
+
+          /*noinspection CssInvalidFunction*/
+          &::-moz-range-track {
+            background-color: light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.1)) !important;
+          }
+
+          /*noinspection CssInvalidFunction*/
+          &::-moz-range-thumb {
+            background-color: light-dark(var(--natsumi-colors-primary), var(--natsumi-primary-color)) !important;
+            width: 12px !important;
+            height: 12px !important;
+            border: none !important;
+          }
+        }
+
+        #scrubber {
+          opacity: 1 !important;
+          width: calc(100% - 4px) !important;
+          height: 6px !important;
+          padding: 0 !important;
+          border: var(--natsumi-material-border) !important;
+          background-color: var(--natsumi-material-background) !important;
+          backdrop-filter: var(--natsumi-material-backdrop) !important;
+          box-shadow: var(--natsumi-material-shadow) !important;
+
+          &::-moz-range-track {
+            height: 6px !important;
+            border-radius: 5px !important;
+            background: transparent !important;
+          }
+
+          &::-moz-range-progress {
+            height: 6px !important;
+            border-radius: 3px 0 0 3px !important;
+            width: 100px !important;
+          }
+
+          &::-moz-range-thumb {
+            border: 4px solid var(--natsumi-material-background) !important;
+            backdrop-filter: var(--natsumi-material-backdrop) !important;
+          }
+        }
+
+        #audio-scrubber {
+          &::-moz-range-thumb {
+            width: 8px !important;
+            height: 8px !important;
+            opacity: 1 !important;
+          }
+        }
+
+        /*noinspection CssInvalidFunction*/
+        button {
+          transition: background-color 0.2s ease, box-shadow 0.2s ease !important;
+          -moz-context-properties: fill;
+          fill: light-dark(black, white) !important;
+          border-radius: 6px !important;
+          opacity: 1 !important;
+
+          &[disabled] {
+            cursor: default !important;
+
+            &::after {
+              display: none !important;
+            }
+          }
+
+          @media -moz-pref("natsumi.theme.disable-sdl2") {
+            &[disabled] {
+              cursor: default !important;
+              fill-opacity: 0.4 !important;
+            }
+
+            &:not([disabled]) {
+              &:hover {
+                background-color: var(--natsumi-button-hover-color) !important;
+              }
+
+              &:active, &[aria-expanded="true"] {
+                background-color: var(--natsumi-button-active-color) !important;
+                box-shadow: 0 0 4px rgba(0, 0, 0, 0.3) !important;
+              }
+            }
+          }
+
+          @media not -moz-pref("natsumi.theme.disable-sdl2") {
+            border-radius: 50% !important;
+            background-color: var(--natsumi-sdl2-haze-button-idle-color) !important;
+            box-shadow: var(--natsumi-sdl2-haze-button-idle-shadow);
+
+            &[disabled] {
+              opacity: 0.5 !important;
+            }
+
+            &:not([disabled]) {
+              &:hover {
+                background-color: var(--natsumi-sdl2-haze-button-hover-color) !important;
+              }
+
+              &:active, &[aria-expanded="true"] {
+                background-color: var(--natsumi-sdl2-haze-button-active-color) !important;
+              }
+            }
+          }
+        }
+
+        .controls-bottom-upper {
+          margin: 0 !important;
+          margin-bottom: 5px !important;
+          width: 100% !important;
+          height: fit-content !important;
+
+          .scrubber-no-drag {
+            margin: 0 !important;
+          }
+
+          &:has(#scrubber[hidden]) {
+            display: none !important;
+            margin: 0 !important;
+          }
+        }
+
+        .controls-bottom-lower {
+          margin: 0 !important;
+        }
+
+        @media -moz-pref("natsumi.pip.legacy-style") {
+          border-radius: 18px !important;
+          background-color: var(--natsumi-material-background) !important;
+          border: var(--natsumi-material-border) !important;
+          backdrop-filter: var(--natsumi-material-backdrop) !important;
+          box-shadow: var(--natsumi-material-shadow) !important;
+
+          .start-controls, .center-controls, .end-controls {
+            border-color: transparent !important;
+            background-color: transparent !important;
+            backdrop-filter: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+          }
+
+          @media -moz-pref("natsumi.theme.disable-sdl2") {
+            #seekBackward, #audio, #fullscreen {
+              border-radius: 4px !important;
+            }
+          }
+
+          #timestamp {
+            padding: 0 !important;
+          }
+
+          #scrubber {
+            border: none !important;
+            background-color: light-dark(rgba(0, 0, 0, 0.2), rgba(255, 255, 255, 0.2)) !important;
+            backdrop-filter: none !important;
+            box-shadow: none !important;
+
+            &::-moz-range-thumb {
+              border: none !important;
+              backdrop-filter: none !important;
+            }
+          }
+        }
+      }
+
+      #settings {
+        bottom: 80px !important;
+        right: 0 !important;
+        display: block !important;
+        transition: opacity 0.3s ease, bottom 0.3s ease !important;
+
+        .arrow {
+          display: none !important;
+        }
+
+        /*noinspection CssInvalidFunction*/
+        label, legend {
+          font-family: system-ui !important;
+          color: light-dark(black, white) !important;
+        }
+
+        /*noinspection CssInvalidFunction*/
+        .slider {
+          background-color: rgba(0, 0, 0, 0.07) !important;
+          outline: 1px solid light-dark(#8f8f9d, #bfbfc9) !important;
+
+          /*noinspection CssInvalidFunction*/
+          &::before {
+            background-color: light-dark(#8f8f9d, #bfbfc9) !important;
+          }
+        }
+
+        input {
+          /*noinspection CssInvalidFunction*/
+          &:checked {
+            border-color: light-dark(var(--natsumi-colors-primary), var(--natsumi-primary-color)) !important;
+          }
+
+          /*noinspection CssInvalidFunction*/
+          &:checked + .slider {
+            background-color: light-dark(var(--natsumi-colors-primary), var(--natsumi-primary-color)) !important;
+            outline-color: light-dark(var(--natsumi-colors-primary), var(--natsumi-primary-color)) !important;
+
+            &::before {
+              background-color: white !important;
+            }
+          }
+        }
+
+        /*noinspection CssInvalidFunction*/
+        & > .panel-fieldset {
+          background-color: var(--natsumi-material-background) !important;
+          backdrop-filter: var(--natsumi-material-backdrop) !important;
+          border: var(--natsumi-material-border-thin) !important;
+          box-shadow: var(--natsumi-material-shadow) !important;
+          padding: 0 !important;
+        }
+
+        /*noinspection CssInvalidFunction*/
+        .grey-line {
+          width: calc(100% - 10px) !important;
+          margin: 0 auto !important;
+          height: 2px !important;
+          border-radius: 2px !important;
+          background-color: light-dark(rgba(20, 20, 20, 0.1), rgba(235, 235, 235, 0.1)) !important;
+        }
+
+        &.hide {
+          bottom: 70px !important;
+          opacity: 0 !important;
+          pointer-events: none !important;
+
+          & > .panel-fieldset {
+            backdrop-filter: none !important;
+          }
+        }
+      }
+    }
+
+    body:fullscreen #controls[showing]:hover, body:not(:fullscreen) #controls:hover {
+      #controls-bottom-gradient {
+        opacity: 1 !important;
+      }
+
+      & > button {
+        opacity: 1 !important;
+        top: 10px !important;
+      }
+
+      #controls-bottom {
+        opacity: 1 !important;
+        bottom: 5px !important;
+      }
+    }
+
+    body:fullscreen {
+      &:has(#controls:not([showing])) {
+        cursor: none !important;
+      }
+    }
+  }
+}

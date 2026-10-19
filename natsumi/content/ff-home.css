@@ -1,0 +1,380 @@
+/*
+
+Natsumi Browser - Welcome to your personal internet.
+
+Copyright (c) 2024-present Green (@greeeen-dev)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+/* ==== Firefox Home tweaks ==== */
+
+@keyframes modal-overlay-fadein {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-fadein {
+  0% {
+    opacity: 0;
+    margin-top: 10px;
+  }
+
+  100% {
+    opacity: 1;
+    margin-top: 0;
+  }
+}
+
+@media not -moz-pref("natsumi.home.disabled") {
+  @-moz-document url-prefix(about:home), url-prefix(about:newtab), url-prefix(about:privatebrowsing) {
+    :root {
+      --natsumi-colors-border: color-mix(in srgb, var(--natsumi-colors-secondary) 80%, black 20%);
+      --toolbarbutton-active-background: rgba(255, 255, 255, 0.9);
+      --toolbarbutton-hover-background: color-mix(in srgb, #202020 10%, transparent);
+      --newtab-weather-background-color: transparent !important;
+
+      @media (prefers-color-scheme: dark) {
+        --toolbarbutton-active-background: color-mix(in srgb, var(--natsumi-primary-color) 50%, rgba(255, 255, 255, .1));
+        --toolbarbutton-hover-background: color-mix(in srgb, #ebebeb 10%, transparent);
+      }
+    }
+
+    * {
+      --box-button-background-color-hover: color-mix(in srgb, var(--natsumi-primary-color) 50%, white);
+      --box-button-background-color-active: color-mix(in srgb, var(--natsumi-primary-color) 70%, white);
+      --button-background-color-selected: color-mix(in srgb, var(--natsumi-primary-color) 70%, white) !important;
+
+      @media (prefers-color-scheme: dark) {
+        --box-button-background-color-hover: color-mix(in srgb, var(--natsumi-primary-color) 50%, black);
+        --box-button-background-color-active: color-mix(in srgb, var(--natsumi-primary-color) 70%, black);
+        --button-background-color-selected: color-mix(in srgb, var(--natsumi-primary-color) 70%, black) !important;
+      }
+    }
+
+    @media -moz-pref("natsumi.home.custom-background") {
+      body {
+        background-image: var(--natsumi-home-bg) !important;
+      }
+    }
+
+    .promo {
+      display: none !important;
+    }
+
+    @media not -moz-pref("browser.nova.enabled") {
+      .toggle-button[aria-pressed="true"] {
+        background-color: var(--natsumi-primary-color) !important;
+
+        &:hover {
+          background-color: color-mix(in srgb, var(--natsumi-primary-color) 15%, #ebebeb) !important;
+
+          @media (prefers-color-scheme: dark) {
+            background-color: color-mix(in srgb, var(--natsumi-primary-color) 15%, #202020) !important;
+          }
+        }
+      }
+    }
+
+    #moz-toggle-label {
+      font-size: 18px !important;
+      font-weight: 500 !important;
+    }
+
+    .weatherCard {
+      background: var(--natsumi-mat-hz-background);
+      backdrop-filter: var(--natsumi-mat-hz-backdrop);
+      border: var(--natsumi-mat-hz-border-thin);
+      box-shadow: var(--natsumi-mat-hz-shadow);
+
+      .weatherInfoLink, .weatherButtonContextMenuWrapper {
+        transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        border-radius: 7px 0 0 7px !important;
+
+        &:hover {
+          background-color: var(--natsumi-sdl2-haze-button-hover-color) !important;
+        }
+
+        &:active {
+          background-color: var(--natsumi-sdl2-haze-button-active-color) !important;
+        }
+      }
+
+      .weatherInfoLink {
+        border-radius: 7px 0 0 7px !important;
+      }
+
+      .weatherButtonContextMenuWrapper {
+        border-radius: 0 7px 7px 0 !important;
+      }
+    }
+
+    .personalize-button {
+      transition: background 0.2s ease;
+      border-radius: 6px !important;
+    }
+
+    .lightWallpaper .personalize-button {
+      color-scheme: light !important;
+      --hover-bg: color-mix(in srgb, #202020 10%, transparent);
+    }
+
+    .darkWallpaper .personalize-button {
+      color-scheme: dark !important;
+      --hover-bg: color-mix(in srgb, #ebebeb 10%, transparent);
+    }
+
+    .personalize-button:hover {
+      background-color: var(--hover-bg) !important;
+    }
+
+    .top-site-outer {
+      transition: background 0.2s ease;
+
+      .top-site-button {
+        border-radius: 10px !important;
+
+        .tile {
+          transition: background 0.2s ease;
+          background-color: var(--natsumi-mat-hz-background) !important;
+          box-shadow: var(--natsumi-mat-hz-shadow) !important;
+          backdrop-filter: var(--natsumi-mat-hz-backdrop) !important;
+        }
+
+        .title span {
+          transition: color 0.2s ease;
+        }
+      }
+
+      &:hover {
+        .tile {
+          background-color: var(--natsumi-primary-color) !important;
+        }
+      }
+    }
+
+    .search-inner-wrapper {
+      border-radius: 50px !important;
+      background-color: var(--natsumi-mat-hz-background) !important;
+      box-shadow: var(--natsumi-mat-hz-shadow) !important;
+      backdrop-filter: var(--natsumi-mat-hz-backdrop) !important;
+      border: var(--natsumi-mat-hz-border-thin) !important;
+
+      #newtab-search-text {
+        background-color: transparent !important;
+        box-shadow: none !important;
+        border-radius: 50px !important;
+      }
+
+      .fake-editable {
+        background-color: transparent !important;
+      }
+    }
+
+    .search-handoff-button {
+      background-color: transparent !important;
+      backdrop-filter: none !important;
+      box-shadow: none !important;
+      border: none !important;
+    }
+
+    /* Modals */
+
+    .modal-overlay, .modalOverlayOuter.active {
+      animation: modal-overlay-fadein 0.3s ease !important;
+      background-color: rgba(28, 27, 34, 0.45) !important;
+    }
+
+    /*noinspection CssInvalidFunction*/
+    .modal {
+      animation: modal-fadein 0.3s ease !important;
+      border-radius: 8px !important;
+      backdrop-filter: var(--natsumi-mat-hz-backdrop) !important;
+      background: var(--natsumi-mat-hz-background) !important;
+      box-shadow: var(--natsumi-mat-hz-shadow) !important;
+      border: var(--natsumi-mat-hz-border-thin) !important;
+
+      .modal-message {
+        display: block !important;
+
+        .icon {
+          width: 100% !important;
+          margin-right: 0 !important;
+          margin-bottom: 20px !important;
+        }
+
+        span p[data-l10n-id^="newtab-confirm-delete-history"] {
+          text-align: center !important;
+          color: white !important;
+
+          &:last-child {
+            font-weight: bold !important;
+          }
+        }
+      }
+
+      .top-site-button .title span {
+        color: black !important;
+
+        @media (prefers-color-scheme: dark) {
+          color: white !important;
+        }
+      }
+
+      /*noinspection CssInvalidFunction*/
+      .actions {
+        border-color: light-dark(rgba(20, 20, 20, 0.2), rgba(235, 235, 235, 0.3)) !important;
+
+        /*noinspection CssInvalidFunction*/
+        button {
+          border: 1px solid light-dark(rgba(20, 20, 20, 0.2), rgba(235, 235, 235, 0.3)) !important;
+          box-shadow: none !important;
+          padding: 10px !important;
+          border-radius: 50px !important;
+          appearance: none !important;
+          color: light-dark(black, white) !important;
+          transition: background-color 0.2s ease !important;
+
+          &:hover {
+            background-color: var(--toolbarbutton-hover-background) !important;
+          }
+
+          &.done {
+            background-color: color-mix(in srgb, var(--natsumi-primary-color) 50%, transparent) !important;
+          }
+        }
+      }
+
+      /*noinspection CssInvalidFunction*/
+      &:has(p[data-l10n-id^="newtab-confirm-delete-history"]) {
+        border: 1px solid rgba(235, 235, 235, 0.3) !important;
+        background: color-mix(in srgb, rgb(255, 100, 100) 75%, transparent) !important;
+
+        .actions {
+          button {
+            color: white !important;
+            border-color: rgba(235, 235, 235, 0.3) !important;
+
+            &.done {
+              background-color: rgba(255, 255, 255, 0.3) !important;
+            }
+          }
+        }
+      }
+    }
+
+    /* Context menu */
+
+    .context-menu {
+      background-color: var(--natsumi-mat-hz-background) !important;
+      box-shadow: var(--natsumi-mat-hz-shadow) !important;
+      backdrop-filter: var(--natsumi-mat-hz-backdrop) !important;
+      border: var(--natsumi-mat-hz-border-thin) !important;
+
+      .context-menu-list {
+        padding-left: 6px !important;
+        padding-right: 6px !important;
+
+        .context-menu-item {
+          button {
+            padding-left: 6px !important;
+            padding-right: 6px !important;
+            border-radius: 6px !important;
+            transition: background-color 0.2s ease !important;
+
+            &:hover {
+              background-color: var(--toolbarbutton-hover-background) !important;
+            }
+
+            &:active {
+              background-color: var(--toolbarbutton-active-background) !important;
+            }
+          }
+        }
+
+        /*noinspection CssInvalidFunction*/
+        .separator {
+          width: 95% !important;
+          margin-left: auto !important;
+          margin-right: auto !important;
+          border-color: light-dark(rgba(20, 20, 20, 0.2), rgba(235, 235, 235, 0.3)) !important;
+        }
+      }
+    }
+
+    .non-handoff-container {
+      #newtab-search-text {
+        background-color: transparent !important;
+        box-shadow: none !important;
+        border-radius: 50px !important;
+      }
+
+      #searchSubmit {
+        border-radius: 0 50px 50px 0 !important;
+      }
+    }
+
+    .widget, .widget-wrapper > article {
+      background-color: var(--natsumi-mat-hz-background) !important;
+      backdrop-filter: var(--natsumi-mat-hz-backdrop) !important;
+      border: var(--natsumi-mat-hz-border-thin) !important;
+      box-shadow: var(--natsumi-mat-hz-shadow) !important;
+      outline: none !important;
+
+      &:hover {
+        background-color: light-dark(#fff, #222) !important;
+      }
+    }
+  }
+
+  /* PB patches */
+  @-moz-document url-prefix(about:privatebrowsing) {
+    body, #search-handoff-button {
+      --natsumi-colors-primary: color-mix(in srgb, var(--natsumi-primary-color) 20%, #202020 80%);
+      --natsumi-colors-secondary: color-mix(in srgb, var(--natsumi-primary-color) 30%, #202020 70%);
+      --natsumi-colors-tertiary: color-mix(in srgb, var(--natsumi-primary-color) 1%, #202020 99%);
+      --natsumi-colors-primary-foreground: color-mix(in srgb, var(--natsumi-primary-color) 80%, white 20%);
+
+      @media -moz-pref('zen.theme.color-prefs.colorful') {
+        --natsumi-colors-primary: color-mix(in srgb, var(--natsumi-primary-color) 50%, black 50%);
+        --natsumi-colors-secondary: color-mix(in srgb, var(--natsumi-primary-color) 40%, black 60%);
+        --natsumi-colors-tertiary: color-mix(in srgb, var(--natsumi-primary-color) 15%, black 85%);
+        --natsumi-colors-primary-foreground: color-mix(in srgb, var(--natsumi-primary-color) 80%, white 20%);
+      }
+    }
+
+    body {
+      background-color: color-mix(in srgb, var(--natsumi-colors-tertiary) 70%, #0f0f0f 30%) !important;
+    }
+
+    .fake-textbox {
+      color: white !important;
+    }
+
+    .fake-caret {
+      background-color: white !important;
+    }
+  }
+}

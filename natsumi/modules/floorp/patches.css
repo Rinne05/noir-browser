@@ -1,0 +1,48 @@
+/*
+
+Natsumi Browser - Welcome to your personal internet.
+
+Copyright (c) 2024-present Green (@greeeen-dev)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+/* ==== Floorp patches ==== */
+
+/* Floorp 12.2.0/12.3.0 patch: show navbar on macOS fullscreen */
+:root[sizemode="fullscreen"]:not([inDOMFullscreen="true"]) {
+  @media (-moz-platform: macos) and (not -moz-pref("natsumi.theme.disable-patches")) {
+    body[natsumi-patches*="floorp-12-2-0-navbar"], body[natsumi-patches*="floorp-12-3-0-navbar"] {
+      #nav-bar {
+        display: flex !important;
+      }
+    }
+  }
+}
+
+/* Floorp 12.3.0 patch: allow hiding the undo closed tab button that keeps being added to toolbar */
+body[natsumi-patches*="floorp-12-3-0-undo-closed-tab"], body[natsumi-patches*="floorp-12-3-1-undo-closed-tab"],
+body[natsumi-patches*="floorp-12-3-2-undo-closed-tab"] {
+  @media -moz-pref("natsumi.theme.patch-undo-closed-tab-button") {
+    #undo-closed-tab {
+      display: none !important;
+    }
+  }
+}

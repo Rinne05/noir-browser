@@ -1,0 +1,258 @@
+/*
+
+Natsumi Browser - Welcome to your personal internet.
+
+Copyright (c) 2024-present Green (@greeeen-dev)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+/* ==== Natsumi theming engine ==== */
+/* This is a drop-in replacement for the theming engine that makes it work more like Zen's, */
+/* except it fully supports custom themes as it should. */
+
+/* Load themes */
+@import "themes/colorful.css";
+@import "themes/playful.css";
+@import "themes/gradient.css";
+@import "themes/gradient-complementary.css";
+@import "themes/lucid.css";
+@import "themes/oled.css";
+@import "themes/frutiger-aero.css";
+@import "themes/lgbtq.css";
+@import "themes/transgender.css";
+@import "themes/custom.css";
+
+/* Translucency */
+:root:not([windowtype*="ssb-window"]) body {
+  @media not -moz-pref("natsumi.theme.disable-translucency") {
+    appearance: -moz-sidebar;
+
+    @media -moz-pref("natsumi.theme.use-legacy-translucency") {
+      appearance: -moz-window-titlebar;
+    }
+
+    @media (-moz-platform: linux) {
+      background-color: transparent !important;
+    }
+  }
+}
+
+/* Theme color engine */
+:root[windowtype*="navigator:browser"] body {
+  --natsumi-theme-color-opacity: 0.5;
+  --natsumi-theme-gradient-opacity: 0.5;
+
+  /* Set rounded corners on Linux (with 5px fallback) */
+  @media (-moz-platform: linux) {
+    :root:not([gtktiledwindow="true"]):not([sizemode="maximized"]) & {
+      &::after,
+      &::before {
+        border-radius: env(-moz-gtk-csd-titlebar-radius, 5px);
+      }
+    }
+  }
+
+  /* Gradient color (overrides solid colors) */
+  #browser::before {
+    --natsumi-theme-gradient-color-left: light-dark(var(--natsumi-primary-color), color-mix(in srgb, var(--natsumi-colors-primary) 95%, white));
+    --natsumi-theme-gradient-color-right: light-dark(var(--natsumi-colors-secondary), color-mix(in srgb, var(--natsumi-primary-color) 50%, black));
+    content: "";
+    background: linear-gradient(135deg, var(--natsumi-theme-gradient-color-left), var(--natsumi-theme-gradient-color-right));
+    width: 100%;
+    height: 100vh;
+    bottom: 0;
+    position: absolute;
+    z-index: -997;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+  }
+
+  /* Grain */
+  #browser::after {
+    content: "";
+    background: url("../icons/custom/grain.png");
+    width: 100%;
+    height: 100vh;
+    position: absolute;
+    z-index: -996;
+    bottom: 0;
+    background-size: 384px;
+    opacity: 0; /* Disabled by default */
+  }
+
+  /* Better translucency for Linux (also acts as a background for no translucency mode) */
+  &::before {
+    content: "";
+    background-color: light-dark(#ebebeb, #171717);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: -999;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+
+    @media (-moz-platform: linux) {
+      opacity: 0.6 !important;
+    }
+
+    @media -moz-pref("natsumi.theme.disable-translucency") {
+      opacity: 1 !important;
+    }
+  }
+
+  /* Solid color */
+  &::after {
+    content: "";
+    background-color: transparent;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: -998;
+    transition: background-color 0.3s ease;
+    opacity: var(--natsumi-theme-color-opacity);
+  }
+
+  @media -moz-pref("natsumi.theme.gray-out-when-inactive") {
+    &:-moz-window-inactive {
+      &::after {
+        background-color: transparent !important;
+      }
+
+      #browser::before {
+        opacity: 0 !important;
+      }
+    }
+  }
+}
+
+@media -moz-pref("natsumi.theme.disable-translucency") {
+  :root[windowtype*="navigator:browser"] body {
+    --natsumi-theme-color-opacity: 1;
+    --natsumi-theme-gradient-opacity: 1;
+  }
+}
+
+/* Theme colors */
+:root[windowtype*="navigator:browser"] {
+  /* Use theme color if possible */
+  &[style*="--lwt"] body::after {
+    background-color: var(--lwt-accent-color);
+  }
+
+  /* Use theme images in solid color layer if possible */
+  &[lwtheme]:not([lwtheme-image-y-align]) body {
+    background-image: none !important;
+
+    &::after {
+      @media (-moz-pref("natsumi.theme.type", "default")) or (not -moz-pref("natsumi.theme.type")) {
+        background-image: var(--lwt-additional-images);
+        background-repeat: var(--lwt-background-tiling);
+        background-position: var(--lwt-background-alignment);
+      }
+    }
+  }
+}
+
+/* Override accent color if theme color is set */
+@media not -moz-pref("natsumi.theme.force-natsumi-color") {
+  :root[style*="--lwt"] {
+    * {
+      --natsumi-primary-color: oklch(from var(--lwt-accent-color) 0.825 0.1 h);
+
+      @media -moz-pref("natsumi.theme.force-actual-theme-color") {
+        --natsumi-primary-color: var(--lwt-accent-color) !important;
+      }
+
+      @media -moz-pref("natsumi.theme.use-tab-theme-color") {
+        .tabbrowser-tab {
+          --natsumi-primary-color: oklch(from var(--lwt-tab-line-color) 0.825 0.1 h);
+
+          @media -moz-pref("natsumi.theme.force-actual-theme-color") {
+            --natsumi-primary-color: var(--lwt-tab-line-color) !important;
+          }
+        }
+      }
+    }
+
+    toolbar[brighttext] #urlbar {
+      color-scheme: dark !important;
+    }
+  }
+}
+
+/* Remove background */
+#browser, #panel-sidebar-select-box, #navigator-toolbox, #nav-bar, #PersonalToolbar, #tabbrowser-tabbox, #tabbrowser-tabpanels {
+  background-color: transparent !important;
+}
+
+#browser {
+  background-image: none !important;
+}
+
+#navigator-toolbox {
+  border: none !important;
+}
+
+/* Add background on fullscreen hover (macOS) */
+* {
+  --natsumi-toolbox-color: var(--lwt-accent-color, var(--toolbox-bgcolor, light-dark(#ebebeb, #171717)));
+  --natsumi-toolbox-color-inactive: var(--lwt-accent-color, var(--toolbox-bgcolor-inactive));
+
+  @media (-moz-platform: windows) {
+    --natsumi-toolbox-color: var(--lwt-accent-color, light-dark(#ebebeb, #171717));
+    --natsumi-toolbox-color-inactive: var(--lwt-accent-color, light-dark(#ebebeb, #171717));
+  }
+}
+
+@media not -moz-pref("natsumi.theme.single-toolbar") {
+  #navigator-toolbox {
+    transition: background-color 0.3s ease;
+
+    &.fullscreen-with-menubar, &.fullscreen-floating-toolbox {
+      background-color: var(--natsumi-toolbox-color) !important;
+
+      &:-moz-window-inactive {
+        background-color: var(--natsumi-toolbox-color-inactive) !important;
+      }
+    }
+  }
+}
+
+@media -moz-pref("natsumi.theme.single-toolbar") {
+  #navigator-toolbox {
+    box-shadow: none !important;
+  }
+}
+
+@media -moz-pref("browser.theme.native-theme") {
+  body::after {
+    z-index: -3 !important;
+    appearance: none !important;
+  }
+
+  #browser::before {
+    z-index: -2 !important;
+  }
+
+  #browser::after {
+    z-index: -1 !important;
+  }
+}

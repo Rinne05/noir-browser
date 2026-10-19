@@ -1,0 +1,17 @@
+/* ==== Config ==== */
+
+/*
+Feel free to change these values to whatever you want, as long
+as they use the correct format.
+*/
+
+* {
+  /* Accent color */
+  --natsumi-accent-color: #a0d490;
+
+  /* pdf.js */
+  --pdfjs-topbar-max-width: 750px; /* use calc(100% - 10px) for max width */
+
+  /* FF home */
+  --home-background-url: url('');
+}

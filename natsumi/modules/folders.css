@@ -1,0 +1,136 @@
+/*
+
+Natsumi Browser - Welcome to your personal internet.
+
+Copyright (c) 2024-present Green (@greeeen-dev)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+/* ==== Tab folders ==== */
+
+@media -moz-pref("sidebar.verticalTabs") {
+  tab-group {
+    --natsumi-tab-height: max(36px, var(--floorp-tab-min-height, var(--tab-min-height)));
+
+    .tab-group-overflow-count-container {
+      display: none !important;
+    }
+
+    .tab-group-label-hover-highlight {
+      background-color: transparent !important;
+      box-shadow: none !important;
+    }
+
+    .tab-group-label-container {
+      height: calc(var(--natsumi-tab-height) - 4px) !important;
+      padding: 0 !important;
+      border-radius: var(--natsumi-tab-border-radius) !important;
+      margin: 2px var(--tab-inner-inline-margin) !important;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: var(--tab-hover-background-color) !important;
+      }
+
+      .tab-group-label {
+        width: 100% !important;
+        height: 100% !important;
+        margin: 0 !important;
+        background-color: transparent !important;
+        outline: none !important;
+        text-align: left !important;
+        font-size: 12px !important;
+        padding: 6px calc(var(--tab-inline-padding) - var(--tab-inner-inline-margin)) !important;
+        color: color-mix(in srgb, var(--toolbox-textcolor-inactive) 70%, transparent) !important;
+
+        &::before {
+          content: "";
+          display: inline-block;
+          position: relative;
+          width: 16px;
+          height: 16px;
+          background-color: light-dark(var(--tab-group-color), var(--tab-group-color-invert));
+          mask-image: url("chrome://global/skin/icons/folder.svg");
+          mask-position: center;
+          mask-size: 100%;
+          left: 0;
+          top: 4px;
+          margin-right: 7.5px !important;
+        }
+      }
+    }
+
+    .tabbrowser-tab {
+      margin-left: 15px !important;
+      opacity: 1;
+      min-height: var(--floorp-tab-min-height, 36px) !important;
+      transition: min-height 0.2s ease, max-height 0.2s ease, opacity 0.2s ease !important;
+    }
+
+    &[collapsed] {
+      .tabbrowser-tab:not([selected]) {
+        display: flex !important;
+        min-height: 0 !important;
+        max-height: 0 !important;
+        opacity: 0 !important;
+      }
+    }
+  }
+
+  #tabbrowser-tabs:not([expanded]) tab-group {
+    .tab-group-label-container {
+      margin: 2px auto !important;
+      min-width: var(--floorp-tab-min-height) !important;
+    }
+
+    &:not([collapsed]) {
+      .tab-group-label-container {
+        &::after {
+          left: 0 !important;
+          height: calc(var(--floorp-tab-min-height) + 2px) !important;
+        }
+      }
+
+      .tabbrowser-tab {
+        margin-left: 0 !important;
+
+        &::after {
+          content: "";
+          position: absolute;
+          width: 2px;
+          height: 100%;
+          background: var(--tab-group-color-invert);
+          left: 5px;
+        }
+      }
+    }
+
+    .tab-group-label {
+      min-width: var(--floorp-tab-min-height) !important;
+      max-height: var(--floorp-tab-min-height) !important;
+      padding: 8px 12px !important;
+    }
+
+    .tabbrowser-tab {
+      margin-left: 0 !important;
+    }
+  }
+}

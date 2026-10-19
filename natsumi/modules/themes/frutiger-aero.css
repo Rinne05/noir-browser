@@ -1,0 +1,52 @@
+/*
+
+Natsumi Browser - Welcome to your personal internet.
+
+Copyright (c) 2024-present Green (@greeeen-dev)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+/* ==== Theme: Frutiger Aero ==== */
+/* A Windows 7-like design for those who like going retro. */
+
+@media -moz-pref("natsumi.theme.type", "frutiger-aero") {
+  :root[windowtype*="navigator:browser"] body {
+    #browser::before {
+      opacity: 0.3 !important;
+      background: linear-gradient(60deg,
+      transparent 0%, #00000014 10%, #ffffff22 10%, #ffffff22 20%, #00000007 20%, transparent 25%,
+      transparent 25%, #00000014 30%, #ffffff22 30%, #ffffff22 32%, #00000007 35%,
+      #ffffff22 35%, #ffffff22 45%, #00000007 45%, transparent 50%,
+      transparent 45%, #00000014 55%, #ffffff22 55%, #ffffff22 70%, #00000007 70%, transparent 80%,
+      transparent 85%, #00000014 90%, #ffffff22 90%, #ffffff22 95%, #00000007 95%, transparent 100%
+      ) !important;
+    }
+
+    &::after {
+      background-color: light-dark(color-mix(in srgb, var(--natsumi-primary-color) 50%, white), var(--natsumi-colors-primary)) !important;
+    }
+  }
+
+  * {
+    --natsumi-toolbox-color: light-dark(color-mix(in srgb, var(--natsumi-primary-color) 50%, white), var(--natsumi-colors-primary)) !important;
+    --natsumi-toolbox-color-inactive: light-dark(color-mix(in srgb, var(--natsumi-primary-color) 50%, white), var(--natsumi-colors-primary)) !important;
+  }
+}

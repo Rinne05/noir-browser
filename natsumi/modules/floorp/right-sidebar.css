@@ -1,0 +1,84 @@
+/*
+
+Natsumi Browser - Welcome to your personal internet.
+
+Copyright (c) 2024-present Green (@greeeen-dev)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+/* ==== Floorp Right Sidebar ==== */
+
+@media -moz-pref("natsumi.browser.type", "floorp") {
+  @media not -moz-pref("sidebar.position_start") {
+    #sidebar-box {
+      order: 4 !important;
+    }
+
+    #sidebar-splitter {
+      order: 3 !important;
+    }
+
+    #tabbrowser-tabbox {
+      order: 2 !important;
+    }
+
+    #nora-statusbar[style*="display:none;"] {
+      left: unset !important;
+      right: var(--natsumi-browser-separation);
+    }
+
+    &:has(#panel-sidebar-select-box) {
+      body[natsumi-panel-sidebar-on-right] {
+        @media -moz-pref("natsumi.theme.single-toolbar") {
+          #navigator-toolbox {
+            right: calc(var(--natsumi-browser-separation) + 36px);
+          }
+
+          body:not([natsumi-compact-mode]) #PersonalToolbar {
+            width: calc(var(--natsumi-bookmarks-width) - 36px - calc(var(--natsumi-browser-separation) * 2)) !important
+          }
+        }
+
+        #nora-statusbar[style*="display:none;"] {
+          right: calc(calc(var(--natsumi-browser-separation) * 2) + 36px);
+        }
+      }
+
+      body:not([natsumi-panel-sidebar-on-right]):not([natsumi-compact-mode]) {
+        #browser:not([data-is-child="true"]) {
+          #tabbrowser-tabbox {
+            margin-left: 0 !important;
+          }
+        }
+      }
+
+      @media -moz-pref("natsumi.theme.single-toolbar") {
+        #navigator-toolbox {
+          left: unset !important;
+        }
+
+        body:not([natsumi-compact-mode]) #PersonalToolbar {
+          margin-left: calc(-100vw + var(--natsumi-sidebar-width) + calc(var(--natsumi-browser-separation) * 2) + 36px) !important;
+        }
+      }
+    }
+  }
+}
