@@ -47,6 +47,14 @@ class NatsumiURLBarController {
     }
 
     init() {
+        // Default the URL bar to open new tabs and stay expanded when idle.
+        if (!ucApi.Prefs.get("natsumi.tabs.replace-new-tab").exists()) {
+            ucApi.Prefs.set("natsumi.tabs.replace-new-tab", true);
+        }
+        if (!ucApi.Prefs.get("natsumi.urlbar.always-expanded").exists()) {
+            ucApi.Prefs.set("natsumi.urlbar.always-expanded", true);
+        }
+
         // Add inline styling for search engine switcher
         let searchmodeSwitcher = document.querySelector(".searchmode-switcher");
         let searchmodeSwitcherInline = document.createElement("style");

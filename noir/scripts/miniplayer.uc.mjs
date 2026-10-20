@@ -32,6 +32,11 @@ SOFTWARE.
 import * as ucApi from "chrome://userchromejs/content/uc_api.sys.mjs";
 import {getMajorFirefoxVersion} from "./version.sys.mjs";
 
+// Default to the matte Miniplayer background (no media artwork).
+if (!ucApi.Prefs.get("natsumi.miniplayer.disable-artwork").exists()) {
+    ucApi.Prefs.set("natsumi.miniplayer.disable-artwork", true);
+}
+
 function convertToXUL(node) {
     // noinspection JSUnresolvedReference
     return window.MozXULElement.parseXULToFragment(node);

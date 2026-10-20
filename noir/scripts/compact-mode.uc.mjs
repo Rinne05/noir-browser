@@ -45,6 +45,11 @@ class NatsumiCompactModeManager {
     }
 
     init() {
+        // Default Compact Mode to hide only the sidebar.
+        if (!ucApi.Prefs.get("natsumi.theme.compact-style").exists()) {
+            ucApi.Prefs.set("natsumi.theme.compact-style", "sidebar");
+        }
+
         let sidebarNode = document.getElementById("sidebar-container") ?? document.getElementById("sidebar-main");
         let navigatorToolboxNode = document.getElementById("navigator-toolbox");
         let navbarNode = document.getElementById("nav-bar");

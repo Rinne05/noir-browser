@@ -53,6 +53,18 @@ function makeCatNoisesAndDoSomeVeryCuteInitialSetupBecauseIFeltVeryCuteWhenWriti
         imeCompositionPref.setTo(true);
     }
 
+    // Default UI preferences: compact extensions panel, context menu icons and
+    // hidden settings subcategories.
+    if (!ucApi.Prefs.get("natsumi.theme.compact-extensions").exists()) {
+        ucApi.Prefs.set("natsumi.theme.compact-extensions", true);
+    }
+    if (!ucApi.Prefs.get("natsumi.theme.context-menu-icons").exists()) {
+        ucApi.Prefs.set("natsumi.theme.context-menu-icons", true);
+    }
+    if (!ucApi.Prefs.get("natsumi.theme.preferences-hide-subcategories").exists()) {
+        ucApi.Prefs.set("natsumi.theme.preferences-hide-subcategories", true);
+    }
+
     // Ensure translucency works on macOS and Windows
     let isMac = Services.appinfo.OS.toLowerCase() === "darwin";
     let isWindows = Services.appinfo.OS.toLowerCase() === "winnt";

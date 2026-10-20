@@ -84,6 +84,11 @@ class NatsumiPinnedTabsManager {
         this.setPinnedTabsWidth();
         Services.prefs.addObserver("natsumi.tabs.pinned-tabs-width", () => {this.setPinnedTabsWidth()});
 
+        // Default to three grid columns in the expanded sidebar.
+        if (!ucApi.Prefs.get("natsumi.sidebar.grid-columns").exists()) {
+            ucApi.Prefs.set("natsumi.sidebar.grid-columns", "3");
+        }
+
         // Set the shared sidebar grid column count
         this.setGridColumns();
         Services.prefs.addObserver("natsumi.sidebar.grid-columns", () => {this.setGridColumns()});
