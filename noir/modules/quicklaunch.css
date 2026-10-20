@@ -1,0 +1,172 @@
+/*
+
+Noir Browser - quick launch bar.
+
+Copyright (c) 2026 rinne05
+Based on Natsumi Browser, Copyright (c) 2024-present Green (@greeeen-dev).
+
+This file is part of Noir Browser and is licensed under the GNU General Public
+License v3.0. See the LICENSE file in the repository for the full text.
+
+*/
+
+/* ==== Quick launch ==== */
+
+@media -moz-pref("sidebar.verticalTabs") {
+  @media not -moz-pref("natsumi.quicklaunch.disabled") {
+    #natsumi-quicklaunch {
+      display: grid;
+      flex: none;
+      /* Containing block for the tile that follows the pointer. */
+      position: relative;
+      /* The sidebar background is a window-drag region (#vertical-tabs).
+         Firefox's UA sheet only excludes XUL buttons and html|input, not
+         html|button, so without this a tile drag moves the whole window. */
+      -moz-window-dragging: no-drag;
+      /* The tab strip adds a 7px flex gap between its children. Cancel it so
+         the gap to the pinned tabs is the same 9px as between pinned rows. */
+      margin-block-end: calc(-1 * var(--space-small, 7px));
+      /* Same geometry as Firefox's vertical pinned tabs: the same column grid,
+         row height and tab padding/margins. That keeps the two grids aligned
+         on the same columns and gives the tiles the same visible size. */
+      grid-template-columns: repeat(auto-fit, minmax(var(--tab-collapsed-width, 46px), auto));
+      grid-auto-rows: calc(41px + (2 * var(--tab-block-margin, 2px)));
+
+      &[hidden] {
+        display: none !important;
+      }
+
+      /* During a drag the tiles animate into their new cells, like pinned
+         tabs do while a tab is dragged. Outside a drag there is no transform
+         transition, matching the pinned tabs. */
+      &.natsumi-quicklaunch-dragging .natsumi-quicklaunch-item {
+        transition:
+          background-color 0.2s ease,
+          scale 0.2s ease,
+          transform 200ms var(--animation-easing-function, cubic-bezier(0.07, 0.95, 0, 1));
+      }
+
+      .natsumi-quicklaunch-item {
+        appearance: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: var(--tab-collapsed-background-width, var(--tab-min-height, 32px));
+        /* Pinned tab backgrounds are inset by the tab's block padding (3px
+           top, 2px bottom) and their own 2px block margin. Reproduce both so
+           the visible tile has exactly the same height as a pinned tab. */
+        height: calc(41px - var(--tab-padding-block-start, 3px) - var(--tab-padding-block-end, 2px));
+        margin-block:
+          calc(var(--tab-block-margin, 2px) + var(--tab-padding-block-start, 3px))
+          calc(var(--tab-block-margin, 2px) + var(--tab-padding-block-end, 2px));
+        margin-inline: var(--tab-margin-inline-inner, 7px);
+        padding: 0;
+        border: none;
+        border-radius: var(--natsumi-tab-border-radius, var(--tab-border-radius, 8px));
+        background-color: color-mix(in srgb, currentColor 7%, transparent);
+        /* Inherit the sidebar color so currentColor (and with it the base
+           background and the fallback icon) matches a pinned tab instead of
+           the button's system color. */
+        color: inherit;
+        cursor: auto;
+        user-select: none;
+        -moz-window-dragging: no-drag;
+        transition: background-color 0.2s ease, scale 0.2s ease;
+
+        img {
+          width: var(--icon-size, 16px);
+          height: var(--icon-size, 16px);
+          pointer-events: none;
+        }
+
+        /* The tile that follows the pointer is a copy, so the original slot
+           stays empty, like the slot of a dragged pinned tab. */
+        &.natsumi-quicklaunch-item-dragging {
+          visibility: hidden;
+        }
+
+        /* Same keyboard focus outline as a pinned tab. */
+        &:focus-visible {
+          outline: var(--focus-outline);
+          outline-offset: var(--focus-outline-inset);
+        }
+
+        &:hover {
+          background-color: var(--tab-background-color-hover, color-mix(in srgb, currentColor 12%, transparent));
+        }
+
+        &:active {
+          scale: 0.95;
+        }
+
+        &.natsumi-quicklaunch-item-noicon::before {
+          content: "";
+          width: var(--icon-size, 16px);
+          height: var(--icon-size, 16px);
+          background-image: url("chrome://global/skin/icons/defaultFavicon.svg");
+          background-size: var(--icon-size, 16px);
+          background-repeat: no-repeat;
+          -moz-context-properties: fill;
+          fill: currentColor;
+        }
+      }
+
+      /* Copy of the dragged tile, moved with the pointer like a dragged
+         pinned tab. Absolute so it stays out of the grid; positioned and
+         sized inline so it exactly matches the tile it replaces. */
+      .natsumi-quicklaunch-item-follower {
+        position: absolute;
+        z-index: 3;
+        margin: 0 !important;
+        pointer-events: none;
+      }
+
+      /* 1x1 transparent element that hides the platform drag image. */
+      .natsumi-quicklaunch-item-blank {
+        position: fixed;
+        inset-block-start: 0;
+        inset-inline-start: 0;
+        width: 1px;
+        height: 1px;
+        margin: 0;
+        padding: 0;
+        border: none;
+        background: transparent;
+        opacity: 0;
+        pointer-events: none;
+      }
+    }
+
+    /* Expanded sidebar: use the same expanded geometry as pinned tabs. */
+    #tabbrowser-tabs[expanded] #natsumi-quicklaunch {
+      grid-template-columns: repeat(auto-fit, minmax(var(--tab-pinned-min-width-expanded, 46px), auto));
+      grid-auto-rows: calc(45px + (2 * var(--tab-block-margin, 2px)));
+      /* Pinned tabs add this padding around their grid when expanded. */
+      padding-inline: var(--tab-container-margin-inline-pinned-expanded, 4px);
+
+      .natsumi-quicklaunch-item {
+        /* Expanded pinned tabs let the background fill the track (auto width
+           plus margins); using 100% here would overflow the track instead. */
+        width: auto;
+        height: calc(45px - var(--tab-padding-block-start, 3px) - var(--tab-padding-block-end, 2px));
+        margin-inline: var(--tab-margin-inline-pinned-expanded, 4px);
+      }
+    }
+
+    /* Pinned tab backgrounds use `margin-inline: auto` in the collapsed
+       launcher, which centers them in the 53px column. Do the same for the
+       quick launch tiles so they line up horizontally. */
+    @media not -moz-pref("sidebar.visibility", "expand-on-hover") {
+      #tabbrowser-tabs:not([expanded]) #natsumi-quicklaunch .natsumi-quicklaunch-item {
+        margin-inline: auto;
+      }
+    }
+
+    /* expand-on-hover sidebars show pinned tabs as a single column, too. */
+    @media -moz-pref("sidebar.visibility", "expand-on-hover") {
+      #natsumi-quicklaunch {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+}

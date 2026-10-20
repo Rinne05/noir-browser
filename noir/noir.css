@@ -44,6 +44,7 @@ Removing or modifying parts of this file may break some parts of Natsumi.
 @import "modules/backdrop-blur.css";
 @import "modules/single-toolbar.css";
 @import "modules/tabs.css";
+@import "modules/quicklaunch.css";
 @import "modules/folders.css";
 @import "modules/urlbar.css";
 @import "modules/findbar.css";

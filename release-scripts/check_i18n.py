@@ -68,7 +68,8 @@ def candidate_strings():
     found = set()
     for path in SOURCES:
         lines = path.read_text(encoding='utf-8').split('\n')
-        body = '\n'.join(lines[30:])
+        # Console messages are not UI text; keep them out of the candidates.
+        body = '\n'.join(line for line in lines[30:] if 'console.' not in line)
         for match in QUOTED.finditer(body):
             if looks_display(match.group(1)):
                 found.add(match.group(1).strip())

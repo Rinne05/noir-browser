@@ -83,6 +83,10 @@ class NatsumiPinnedTabsManager {
         // Set pinned tabs width
         this.setPinnedTabsWidth();
         Services.prefs.addObserver("natsumi.tabs.pinned-tabs-width", () => {this.setPinnedTabsWidth()});
+
+        // Set the shared sidebar grid column count
+        this.setGridColumns();
+        Services.prefs.addObserver("natsumi.sidebar.grid-columns", () => {this.setGridColumns()});
     }
 
     setPinnedTabsWidth() {
@@ -115,7 +119,51 @@ class NatsumiPinnedTabsManager {
             }
 
             currentStyle = document.createElement("style");
+            currentStyle.id = "natsumi-pinned-tabs-width";
             currentStyle.textContent = pinnedTabsStyle;
+            document.head.appendChild(currentStyle);
+        }
+    }
+
+    setGridColumns() {
+        let columns = "auto";
+        if (ucApi.Prefs.get("natsumi.sidebar.grid-columns").exists()) {
+            columns = ucApi.Prefs.get("natsumi.sidebar.grid-columns").value;
+        }
+
+        let columnCount = parseInt(columns);
+        let isNumber = columns !== "default" && columns !== "auto"
+            && Number.isFinite(columnCount) && columnCount >= 1 && columnCount <= 8;
+
+        const gridStyle = `
+            /* Only the expanded sidebar has room for a fixed column count; the
+               collapsed launcher is a single column, and expand-on-hover keeps
+               Firefox's single-column pinned layout. */
+            @media not -moz-pref("sidebar.visibility", "expand-on-hover") {
+                #tabbrowser-tabs[expanded] #natsumi-quicklaunch,
+                #tabbrowser-tabs[expanded] #pinned-tabs-container[orient="vertical"]::part(items-wrapper) {
+                    grid-template-columns: repeat(${columnCount}, 1fr) !important;
+                }
+            }
+        `;
+
+        let currentStyle = document.getElementById("natsumi-grid-columns");
+
+        if (currentStyle) {
+            if (!isNumber) {
+                currentStyle.remove();
+                return;
+            }
+
+            currentStyle.textContent = gridStyle;
+        } else {
+            if (!isNumber) {
+                return;
+            }
+
+            currentStyle = document.createElement("style");
+            currentStyle.id = "natsumi-grid-columns";
+            currentStyle.textContent = gridStyle;
             document.head.appendChild(currentStyle);
         }
     }

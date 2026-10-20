@@ -819,9 +819,38 @@ toolbarseparator.proton-zap::before {
   }
 }
 
+/* Let the pinned tabs area grow with its content instead of keeping a height
+   remembered from an earlier splitter drag. It can still shrink (and scroll)
+   when the sidebar runs out of room, because the tab list keeps its minimum. */
+#pinned-tabs-container[orient="vertical"] {
+  height: auto !important;
+  flex: 0 1 auto;
+}
+
+/* Firefox positions a dragged pinned tab with `tab.top - pinned container top`
+   but the containing block for that absolute position is the sidebar origin,
+   so it assumes the pinned container starts at the top of the tab strip. The
+   quick launch bar sits above it, so make the container the containing block
+   itself; the drag then starts exactly where the tab is. Scoped to the same
+   state as Firefox's grid drag logic (expanded, not expand-on-hover). */
+@media not -moz-pref("sidebar.visibility", "expand-on-hover") {
+  #tabbrowser-tabs[expanded] #pinned-tabs-container[orient="vertical"] {
+    position: relative;
+  }
+}
+
 #vertical-pinned-tabs-splitter {
-  &:not(:hover) {
-    opacity: 0;
+  /* Reserved as blank spacing: no divider line, no drag-to-resize, no hover
+     affordance. The element stays in the layout so the gap remains. */
+  pointer-events: none !important;
+  cursor: default !important;
+  opacity: 0 !important;
+  background-image: none !important;
+  background-color: transparent !important;
+  border: none !important;
+
+  &:hover {
+    background-color: transparent !important;
   }
 
   &[hidden="true"] {

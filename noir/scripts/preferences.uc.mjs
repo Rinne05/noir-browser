@@ -1818,6 +1818,120 @@ function addSidebarAppearancePane() {
     let sidebarAppearanceNode = sidebarAppearanceGroup.generateNode();
 
     addToGroupbox(sidebarAppearanceNode, "natsumiSidebar");
+
+    // Shared column count for the pinned tabs and quick launch grids
+    let gridColumnsSelection = new RadioPreference(
+        "natsumiSidebarGridColumns",
+        "natsumi.sidebar.grid-columns",
+        "Grid columns",
+        "Choose how many icons to show per row in the sidebar grids (pinned tabs and quick launch)."
+    );
+    for (let columns of ["default", "1", "2", "3", "4", "5"]) {
+        gridColumnsSelection.registerOption(columns, new RadioChoice(
+            columns,
+            columns === "default" ? "Auto" : columns,
+            ""
+        ));
+    }
+
+    let gridColumnsNode = gridColumnsSelection.generateNode();
+    let gridColumnsButtons = gridColumnsNode.querySelectorAll(".natsumi-radio-choice");
+    gridColumnsButtons.forEach(button => {
+        button.addEventListener("click", () => {
+            let selectedValue = button.getAttribute("value");
+            setStringPreference("natsumi.sidebar.grid-columns", selectedValue);
+            gridColumnsButtons.forEach((btn) => {
+                btn.removeAttribute("selected");
+                let radioCheck = btn.querySelector(".radio-check");
+                radioCheck.removeAttribute("selected");
+            });
+            button.setAttribute("selected", "true");
+            let radioCheck = button.querySelector(".radio-check");
+            radioCheck.setAttribute("selected", "true");
+        });
+    });
+    addToGroupbox(gridColumnsNode, "natsumiSidebar");
+}
+
+const quickLaunchFolderPref = "natsumi.quicklaunch.folder";
+
+function addQuickLaunchPane() {
+    let quickLaunchGroup = new OptionsGroup(
+        "natsumiQuickLaunch",
+        "Quick launch",
+        "Show shortcuts for a bookmarks folder above your tabs."
+    );
+
+    quickLaunchGroup.registerOption("natsumiQuickLaunchToggle", new CheckboxChoice(
+        "natsumi.quicklaunch.disabled",
+        "natsumiQuickLaunchToggle",
+        "Show quick launch bar",
+        "",
+        true
+    ));
+
+    let quickLaunchNode = quickLaunchGroup.generateNode();
+    addToGroupbox(quickLaunchNode, "natsumiSidebar");
+
+    let folderNode = convertToXUL(`
+        <html:div class="natsumi-groupbox-content" data-category="paneNatsumiSettings">
+            <html:div class="natsumi-group-label">Bookmarks folder</html:div>
+            <html:div id="natsumiQuickLaunchFolderSettings"></html:div>
+        </html:div>
+    `);
+    addToGroupbox(folderNode, "natsumiSidebar");
+
+    let folderSelect = document.createElement("select");
+    folderSelect.id = "natsumiQuickLaunchFolder";
+    document.getElementById("natsumiQuickLaunchFolderSettings").appendChild(folderSelect);
+    populateQuickLaunchFolders(folderSelect);
+}
+
+async function populateQuickLaunchFolders(select) {
+    const { PlacesUtils } = ChromeUtils.importESModule("resource://gre/modules/PlacesUtils.sys.mjs");
+
+    let tree;
+    try {
+        tree = await PlacesUtils.promiseBookmarksTree(PlacesUtils.bookmarks.rootGuid);
+    } catch(e) {
+        console.error("Failed to list bookmark folders:", e);
+        return;
+    }
+
+    let currentFolder = "";
+    if (ucApi.Prefs.get(quickLaunchFolderPref).exists()) {
+        currentFolder = ucApi.Prefs.get(quickLaunchFolderPref).value;
+    }
+
+    let noneOption = document.createElement("option");
+    noneOption.value = "";
+    noneOption.textContent = t("None");
+    select.appendChild(noneOption);
+
+    const addFolders = (node, depth) => {
+        for (let child of node.children ?? []) {
+            if (child.type !== PlacesUtils.TYPE_X_MOZ_PLACE_CONTAINER) {
+                continue;
+            }
+
+            let option = document.createElement("option");
+            option.value = child.guid;
+            option.textContent = `${"— ".repeat(depth)}${child.title || t("Untitled")}`;
+            select.appendChild(option);
+
+            addFolders(child, depth + 1);
+        }
+    };
+    addFolders(tree, 0);
+
+    select.value = currentFolder;
+    select.addEventListener("change", () => {
+        if (select.value) {
+            setStringPreference(quickLaunchFolderPref, select.value);
+        } else {
+            ucApi.Prefs.get(quickLaunchFolderPref).reset();
+        }
+    });
 }
 
 function addSidebarWorkspacesPane() {
@@ -3163,6 +3277,7 @@ function addPreferencesPanes() {
         "chrome://natsumi/content/icons/lucide/sidebar.svg"
     );
     addSidebarAppearancePane();
+    addQuickLaunchPane();
     addSidebarWorkspacesPane();
     addSidebarPanelSidebarPane();
     addSidebarButtonsPane();

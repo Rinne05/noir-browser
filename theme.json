@@ -78,6 +78,12 @@
           "chrome://browser/content/browser.xhtml"
         ]
       },
+      "quicklaunch.uc.mjs": {
+        "loadOrder": 13,
+        "include": [
+          "chrome://browser/content/browser.xhtml"
+        ]
+      },
       "miniplayer.uc.mjs": {
         "include": [
           "chrome://browser/content/browser.xhtml"

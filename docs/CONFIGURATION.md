@@ -64,6 +64,7 @@ type).
 | `natsumi.sidebar.clear-merge-with-workspaces` | boolean | — | Merge the clear button with the Workspaces indicator **Floorp** |
 | `natsumi.sidebar.hide-sidebar-controls` | boolean | — | Hide sidebar controls |
 | `natsumi.sidebar.disable-bottom-toolbar` | boolean | — | Disable the bottom toolbar |
+| `natsumi.sidebar.grid-columns` | string | `default` (auto), `1`–`5` | Icons per row in the expanded sidebar's pinned tabs and quick launch grids (the collapsed launcher stays one column) |
 | `natsumi.sidebar.disable-clickable-workspace-icons` | boolean | — | Disable clickable workspace icons **Floorp** |
 | `natsumi.sidebar.floorp-floating-panel` | boolean | — | Float the Panel Sidebar like Compact Mode **Floorp** |
 | `natsumi.sidebar.hide-workspace-indicator` | boolean | — | Hide Noir's Workspaces indicator **Floorp** |
@@ -112,6 +113,17 @@ type).
 | `natsumi.pdfjs.material` | string | `haze` (default), `tinted-haze` | Material used by the PDF viewer |
 | `natsumi.home.disabled` | boolean | — | Disable the Noir home page |
 | `natsumi.home.custom-background` | boolean | — | Use the configured background on the home page |
+
+## Quick launch
+
+A grid of shortcuts at the top of the sidebar, above the pinned tabs (vertical tabs only),
+rendered from the direct bookmarks of one folder. Left click opens the site in a new tab, middle click opens it in a background tab.
+Drag a tile to reorder it; the new order is written back to the folder. The list refreshes when the folder's bookmarks or their favicons change, or when the folder pref changes. Arrow keys move between tiles and the whole grid is a single tab stop. Right-click a tile for bookmark actions (open, copy, edit, delete).
+
+| Pref | Type | Values | Description |
+|---|---|---|---|
+| `natsumi.quicklaunch.disabled` | boolean | — | Hide the quick launch bar |
+| `natsumi.quicklaunch.folder` | string | bookmark folder GUID | Folder whose bookmarks are shown (choose it in Settings → Sidebar & Buttons → Quick launch) |
 
 ## Startup
 

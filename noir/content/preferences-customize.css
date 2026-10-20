@@ -1280,6 +1280,10 @@ SOFTWARE.
     }
   }
 
+  #natsumiQuickLaunchFolder {
+    width: 100%;
+  }
+
   .natsumi-settings-info {
     --natsumi-info-color: #00aaff;
     padding: 10px;
