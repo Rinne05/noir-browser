@@ -23,6 +23,8 @@ SOFTWARE.
 """
 
 import argparse
+import configparser
+import importlib
 import os
 import sys
 import shutil
@@ -130,6 +132,12 @@ infected with malware, installing Noir may put your browser data at higher risk 
 maliciously. Please ensure your system is secure before proceeding with installation."
 
 def get_admin():
+    if sys.platform == 'win32':
+        try:
+            import ctypes
+            return bool(ctypes.windll.shell32.IsUserAnAdmin())
+        except Exception:
+            return False
     return os.geteuid() == 0
 
 def download_from_git(repository, branch, destination, is_tag=False):
@@ -175,17 +183,82 @@ def _get_macos_path(browser: BrowserEntry):
     return path
 
 def _get_windows_path(browser: BrowserEntry):
-    if browser.name_universal == 'mozilla':
-        win_name = 'Mozilla\\Firefox'
-    else:
-        win_name = browser.name_universal
-    path = home + f'\\AppData\\Roaming\\{win_name}\\Profiles'
-    print(path)
+    if not browser.name_windows:
+        raise NotADirectoryError('Browser is not supported on Windows')
 
-    if not os.path.exists(path):
+    roaming = os.environ.get('APPDATA')
+    if not roaming:
+        roaming = os.path.join(home, 'AppData', 'Roaming')
+
+    parts = browser.name_windows.replace('\\', '/').split('/')
+    path = os.path.join(roaming, *parts)
+
+    if not os.path.isdir(path):
         raise NotADirectoryError('Browser is not installed')
 
     return path
+
+WINDOWS_BROWSER_EXES = {
+    'mozilla': 'firefox.exe',
+    'floorp': 'floorp.exe',
+    'waterfox': 'waterfox.exe',
+    'librewolf': 'librewolf.exe',
+    'glide-browser': 'glide.exe',
+}
+
+def _get_windows_install_path(browser: BrowserEntry):
+    exe_name = WINDOWS_BROWSER_EXES.get(browser.name_universal)
+    folder_name = browser.name_windows_binary
+    if not exe_name or not folder_name:
+        raise NotADirectoryError('Browser is not supported on Windows')
+
+    candidates = []
+
+    try:
+        winreg = importlib.import_module('winreg')
+    except ImportError:
+        winreg = None
+
+    if winreg:
+        key_path = rf'SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\{exe_name}'
+        for hive in (winreg.HKEY_LOCAL_MACHINE, winreg.HKEY_CURRENT_USER):
+            for view in (winreg.KEY_WOW64_64KEY, winreg.KEY_WOW64_32KEY):
+                try:
+                    with winreg.OpenKey(hive, key_path, 0, winreg.KEY_READ | view) as key:
+                        value, _ = winreg.QueryValueEx(key, None)
+                    value = os.path.expandvars(value.strip('"'))
+                    if value:
+                        candidates.append(os.path.dirname(value))
+                except OSError:
+                    continue
+
+    roots = [
+        os.environ.get('ProgramFiles'),
+        os.environ.get('ProgramFiles(x86)'),
+        os.environ.get('LOCALAPPDATA'),
+        os.path.join(home, 'AppData', 'Local'),
+    ]
+
+    for root in roots:
+        if not root:
+            continue
+        candidates.append(os.path.join(root, folder_name))
+        candidates.append(os.path.join(root, 'Programs', folder_name))
+        if browser.name_universal == 'waterfox':
+            candidates.append(os.path.join(root, 'Waterfox', 'Waterfox'))
+
+    seen = set()
+    for candidate in candidates:
+        if not candidate:
+            continue
+        candidate = os.path.normpath(candidate)
+        if candidate in seen:
+            continue
+        seen.add(candidate)
+        if os.path.isfile(os.path.join(candidate, exe_name)):
+            return candidate
+
+    raise NotADirectoryError('Browser is not installed')
 
 def _get_linux_path(browser: BrowserEntry):
     browser_path = home + f'/.{browser.name_universal}'
@@ -215,25 +288,56 @@ def _get_flatpak_path(browser: BrowserEntry):
 browsers = [
     BrowserEntry('Firefox', 'mozilla', 'Firefox', 'org.mozilla.firefox', 'Mozilla/Firefox', 'Mozilla Firefox'),
     BrowserEntry('Floorp', 'floorp', 'Floorp', None, 'Floorp', 'Floorp'),
-    BrowserEntry('Waterfox', 'waterfox', 'Waterfox', None, 'Waterfox/Waterfox', 'Waterfox'),
-    BrowserEntry('Librewolf', 'librewolf', 'LibreWolf', 'io.gitlab.librewolf-community', 'librewolf', 'librewolf'),
+    BrowserEntry('Waterfox', 'waterfox', 'Waterfox', None, 'Waterfox', 'Waterfox'),
+    BrowserEntry('Librewolf', 'librewolf', 'LibreWolf', 'io.gitlab.librewolf-community', 'librewolf', 'LibreWolf'),
     BrowserEntry('Glide', 'glide-browser', 'Glide', None, None, None)
 ]
 
 def get_profiles(path):
-    profiles = []
-    for entry in os.listdir(path):
-        if not os.path.isdir(f'{path}/{entry}'):
-            continue
+    if os.path.isfile(os.path.join(path, 'prefs.js')) or os.path.isfile(os.path.join(path, 'times.json')):
+        return [os.path.normpath(path)]
 
-        if '.' in entry:
-            profiles.append(f'{path}/{entry}')
+    profiles = []
+
+    ini_path = os.path.join(path, 'profiles.ini')
+    if os.path.isfile(ini_path):
+        parser = configparser.ConfigParser(interpolation=None)
+        try:
+            parser.read(ini_path, encoding='utf-8-sig')
+        except (configparser.Error, OSError, UnicodeError):
+            parser = None
+        if parser:
+            for section in parser.sections():
+                if not section.startswith('Profile'):
+                    continue
+                raw_path = parser.get(section, 'Path', fallback='').strip()
+                if not raw_path:
+                    continue
+                is_relative = parser.get(section, 'IsRelative', fallback='1').strip() != '0'
+                candidate = raw_path if not is_relative else os.path.join(path, raw_path)
+                candidate = os.path.normpath(candidate)
+                if os.path.isdir(candidate) and candidate not in profiles:
+                    profiles.append(candidate)
+
+    for base in (path, os.path.join(path, 'Profiles')):
+        try:
+            entries = os.listdir(base)
+        except OSError:
+            continue
+        for entry in entries:
+            candidate = os.path.normpath(os.path.join(base, entry))
+            if candidate in profiles or not os.path.isdir(candidate):
+                continue
+            if ('.' in entry
+                    or os.path.isfile(os.path.join(candidate, 'prefs.js'))
+                    or os.path.isfile(os.path.join(candidate, 'times.json'))):
+                profiles.append(candidate)
 
     return profiles
 
 def prompt_for_path(message):
     while True:
-        user_input = input(f"{message}\nFile path (type 'exit' to quit): ").strip()
+        user_input = input(f"{message}\nFile path (type 'exit' to quit): ").strip().strip('"')
         if user_input.lower() == 'exit':
             sys.exit(0)
         if os.path.exists(user_input):
@@ -241,24 +345,26 @@ def prompt_for_path(message):
         print("Path does not exist. Please try again.")
 
 def select_browser(prompt='Select the browser to install Noir to:'):
+    available = [browser for browser in browsers if sys.platform != 'win32' or browser.name_windows]
     print(prompt)
-    for idx, browser in enumerate(browsers):
+    for idx, browser in enumerate(available):
         print(f"{idx+1}. {browser.name}")
     while True:
         try:
             choice = int(input()) - 1
-            if choice < 0 or choice >= len(browsers):
+            if choice < 0 or choice >= len(available):
                 raise ValueError()
-            return browsers[choice]
+            return available[choice]
         except ValueError:
-            print(f'Invalid input. Please choose a number between 1 and {len(browsers)}.')
+            print(f'Invalid input. Please choose a number between 1 and {len(available)}.')
         except KeyboardInterrupt:
             sys.exit(0)
 
 def detect_install_and_profiles(browser):
     # Detect install path
     install_path = None
-    profile_paths = []
+    profile_root = None
+
     try:
         if sys.platform == 'darwin':
             install_path = f'/Applications/{browser.name_macos}.app/Contents/Resources'
@@ -275,32 +381,31 @@ def detect_install_and_profiles(browser):
                         profile_root = None
                 else:
                     profile_root = None
+        elif sys.platform == 'win32':
+            install_path = _get_windows_install_path(browser)
+            profile_root = _get_windows_path(browser)
         else:
             raise NotImplementedError('Unsupported platform')
     except NotADirectoryError:
         profile_root = None
 
-    print(f"[DEBUG] Detected install_path: {install_path}")
-    print(f"[DEBUG] os.path.isdir(install_path): {os.path.isdir(install_path) if install_path else 'N/A'}")
-    print(f"[DEBUG] Detected profile_root: {profile_root}")
-    print(f"[DEBUG] os.path.isdir(profile_root): {os.path.isdir(profile_root) if profile_root else 'N/A'}")
-
     if not install_path or not os.path.isdir(install_path):
         if sys.platform == 'darwin':
             os_specific_instructions = "On macOS, this would be /path/to/Browser.app/Contents/Resources."
+        elif sys.platform == 'win32':
+            os_specific_instructions = (
+                "On Windows, this is the folder containing the browser executable "
+                "(for example C:\\Program Files\\Mozilla Firefox)."
+            )
         else:
             os_specific_instructions = "On Linux, this would be the folder the browser's binary is located in."
 
         install_path = prompt_for_path(
             f"Could not detect install location for {browser.name}. Please enter the browser's install location.\n{os_specific_instructions}"
         )
-        print(f"[DEBUG] User provided install_path: {install_path}")
-        print(f"[DEBUG] os.path.isdir(install_path): {os.path.isdir(install_path)}")
 
     if not profile_root or not os.path.isdir(profile_root):
         profile_root = prompt_for_path(f"Could not detect profiles directory for {browser.name}.")
-        print(f"[DEBUG] User provided profile_root: {profile_root}")
-        print(f"[DEBUG] os.path.isdir(profile_root): {os.path.isdir(profile_root)}")
 
     # Get profiles
     profile_paths = get_profiles(profile_root)
@@ -309,14 +414,17 @@ def detect_install_and_profiles(browser):
 
         if sys.platform == 'darwin':
             os_specific_instructions = "On macOS, this would usually be /Users/user/Library/Application Support/Browser/Profiles."
+        elif sys.platform == 'win32':
+            os_specific_instructions = (
+                "On Windows, this is usually %APPDATA%\\Mozilla\\Firefox "
+                "(or the folder containing profiles.ini)."
+            )
         else:
             os_specific_instructions = "On Linux, this would be the parent folder to your profile folders (e.g. /home/user/.browser)."
 
         profile_root = prompt_for_path(
             f"Please enter a valid profile directory for {browser.name}.\n{os_specific_instructions}"
         )
-        print(f"[DEBUG] User provided profile_root (no profiles): {profile_root}")
-        print(f"[DEBUG] os.path.isdir(profile_root): {os.path.isdir(profile_root)}")
         profile_paths = get_profiles(profile_root)
 
     return install_path, profile_paths
@@ -756,6 +864,9 @@ def main():
     elif sys.platform.startswith('linux'):
         # Check install location
         needs_sudo = True
+    elif sys.platform == 'win32':
+        # fx-autoconfig's program files live in the browser install folder.
+        needs_sudo = True
 
     # Create temporary directory
     current_dir = os.getcwd()
@@ -796,7 +907,11 @@ def main():
 
     if not fx_autoconfig_installed:
         if needs_sudo and not get_admin():
-            print('Sudo/administrator is required to install Noir to this browser.')
+            if sys.platform == 'win32':
+                print('Administrator is required to write the fx-autoconfig files.')
+                print('Right-click the installer and choose "Run as administrator".')
+            else:
+                print('Sudo/administrator is required to install Noir to this browser.')
             sys.exit(1)
 
         print('Installing fx-autoconfig...')
@@ -820,13 +935,21 @@ def main():
 
         # Copy fx-autoconfig files
         if "librewolf.cfg" in os.listdir(install_path):
-            # Assume we're on LibreWolf
-            profile_root = f'{profile}/..'
-            if sys.platform == 'darwin':
-                # We need to copy this to ~/.librewolf for some odd reason?
-                home_directory = os.getenv("HOME")
-                os.makedirs(f'{home_directory}/.librewolf', exist_ok=True)
-                profile_root = f'{home_directory}/.librewolf'
+            # Assume we're on LibreWolf. Portable builds keep the override in the
+            # profile folder; installed builds use the per-user config root.
+            if os.path.isdir(os.path.join(install_path, 'Profiles')):
+                profile_root = profile
+            else:
+                profile_root = os.path.dirname(os.path.abspath(profile))
+                if os.path.basename(profile_root) == 'Profiles':
+                    profile_root = os.path.dirname(profile_root)
+                if sys.platform == 'darwin':
+                    # LibreWolf reads overrides from ~/.librewolf.
+                    profile_root = os.path.join(home, '.librewolf')
+                elif sys.platform == 'win32':
+                    # Installed LibreWolf reads overrides from %USERPROFILE%\.librewolf.
+                    profile_root = os.path.join(home, '.librewolf')
+            os.makedirs(profile_root, exist_ok=True)
 
             shutil.copyfile('.noir-installer/fx-autoconfig/program/config.js', f'{profile_root}/librewolf.overrides.cfg')
             shutil.copy('.noir-installer/fx-autoconfig/program/defaults/pref/config-prefs-librewolf.js', f'{install_path}/defaults/pref/config-prefs.js')
@@ -916,9 +1039,11 @@ def main():
         js_copies=manifest_js_copies,
     ))
 
-    if get_admin():
-        print('Fixing permissions...')
-        os.system(f'chown -R {os.environ["SUDO_USER"]} "{profile}/chrome"')
+    if sys.platform != 'win32' and get_admin():
+        sudo_user = os.environ.get('SUDO_USER')
+        if sudo_user:
+            print('Fixing permissions...')
+            os.system(f'chown -R {sudo_user} "{profile}/chrome"')
 
     print('Noir installed successfully! ^w^')
 
@@ -937,44 +1062,43 @@ def parse_args():
 
 if __name__ == '__main__':
     should_prompt_exit = True
-    if sys.platform == 'win32':
-        print('This installer only works for macOS and Linux. Please use the Windows installer instead.')
-    else:
-        args = parse_args()
-        try:
-            print('Welcome to the Noir installer! >w<')
-            action = 'uninstall' if args.uninstall else 'install'
-            if not args.uninstall and not args.profile:
-                print('1. Install Noir')
-                print('2. Uninstall Noir')
-                action = 'uninstall' if input().strip() == '2' else 'install'
+    args = parse_args()
+    try:
+        if os.path.isdir('.noir-installer'):
+            shutil.rmtree('.noir-installer')
+        print('Welcome to the Noir installer! >w<')
+        action = 'uninstall' if args.uninstall else 'install'
+        if not args.uninstall and not args.profile:
+            print('1. Install Noir')
+            print('2. Uninstall Noir')
+            action = 'uninstall' if input().strip() == '2' else 'install'
 
-            if action == 'uninstall':
-                uninstall_main(args)
-            else:
-                if args.profile:
-                    print('[WARN] --profile only applies to uninstalling and will be ignored.')
-                main()
+        if action == 'uninstall':
+            uninstall_main(args)
+        else:
+            if args.profile:
+                print('[WARN] --profile only applies to uninstalling and will be ignored.')
+            main()
 
-            if os.path.exists('.noir-installer'):
-                shutil.rmtree('.noir-installer')
-        except KeyboardInterrupt:
-            if os.path.exists('.noir-installer'):
-                shutil.rmtree('.noir-installer')
-            should_prompt_exit = False
-        except SystemExit:
-            if os.path.exists('.noir-installer'):
-                shutil.rmtree('.noir-installer')
-            should_prompt_exit = False
-        except EOFError:
-            # stdin closed (piped/scripted run) - exit cleanly
-            if os.path.exists('.noir-installer'):
-                shutil.rmtree('.noir-installer')
-            should_prompt_exit = False
-        except:
-            if os.path.exists('.noir-installer'):
-                shutil.rmtree('.noir-installer')
-            traceback.print_exc()
+        if os.path.exists('.noir-installer'):
+            shutil.rmtree('.noir-installer')
+    except KeyboardInterrupt:
+        if os.path.exists('.noir-installer'):
+            shutil.rmtree('.noir-installer')
+        should_prompt_exit = False
+    except SystemExit:
+        if os.path.exists('.noir-installer'):
+            shutil.rmtree('.noir-installer')
+        should_prompt_exit = False
+    except EOFError:
+        # stdin closed (piped/scripted run) - exit cleanly
+        if os.path.exists('.noir-installer'):
+            shutil.rmtree('.noir-installer')
+        should_prompt_exit = False
+    except:
+        if os.path.exists('.noir-installer'):
+            shutil.rmtree('.noir-installer')
+        traceback.print_exc()
 
     if should_prompt_exit and sys.stdin.isatty():
         print('Press enter to exit:')

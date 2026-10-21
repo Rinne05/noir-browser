@@ -33,11 +33,9 @@ jobs:
       - uses: actions/checkout@v6
       - name: Set up Python
         uses: actions/setup-python@v6
-        if: ${{ matrix.os != 'windows-latest' }}
         with:
           python-version: '3.13'
       - name: Install dependencies
-        if: ${{ matrix.os != 'windows-latest' }}
         run: |
           python -m pip install --upgrade pip
           pip install -r installer/requirements.txt
@@ -49,6 +47,16 @@ jobs:
           script-name: installer/installer.py
           mode: onefile
           disable-cache: true
+          include-data-files: "installer/installer.json=installer.json"
+      - name: Build (Windows)
+        uses: Nuitka/Nuitka-Action@main
+        if: ${{ matrix.os == 'windows-latest' }}
+        with:
+          nuitka-version: main
+          script-name: installer/installer.py
+          mode: onefile
+          disable-cache: true
+          windows-uac-admin: true
           include-data-files: "installer/installer.json=installer.json"
       - name: Build (macOS Intel)
         uses: Nuitka/Nuitka-Action@main
@@ -71,7 +79,11 @@ jobs:
           mv build_intel/installer.bin build_intel/noir-installer-macos-intel
       - name: Rename (Windows)
         if: ${{ matrix.os == 'windows-latest' }}
-        run: Rename-Item -Path installer/windows-installer.bat -NewName noir-installer.bat
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem -Path build -Filter installer.exe -Recurse | Select-Object -First 1
+          if (-not $exe) { throw 'Nuitka did not produce installer.exe' }
+          Move-Item -Path $exe.FullName -Destination build/noir-installer-windows.exe
       - name: Upload package (macOS arm64)
         uses: actions/upload-artifact@v7
         if: ${{ matrix.os == 'macos-latest' }}
@@ -93,12 +105,12 @@ jobs:
           name: noir-installer-linux
           path: build/noir-installer-linux
           retention-days: 7
-      - name: Upload package (PowerShell)
+      - name: Upload package (Windows)
         uses: actions/upload-artifact@v7
         if: ${{ matrix.os == 'windows-latest' }}
         with:
           name: noir-installer-windows
-          path: installer/noir-installer.bat
+          path: build/noir-installer-windows.exe
           retention-days: 7
   release:
     name: Release
@@ -133,7 +145,7 @@ jobs:
           artifacts: 'noir-installer-macos-arm64/noir-installer-macos-arm64,
             noir-installer-macos-x64/noir-installer-macos-intel,
             noir-installer-linux/noir-installer-linux,
-            noir-installer-windows/noir-installer.bat'
+            noir-installer-windows/noir-installer-windows.exe'
   publish:
     name: "Publish release"
     runs-on: ubuntu-latest

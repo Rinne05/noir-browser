@@ -61,12 +61,13 @@ program files), plus the `about:config` switch that the settings page needs. See
 
 ### Option B — release installer
 
-Every tagged release ships an installer for macOS/Linux (Python/Nuitka) and Windows (batch).
+Every tagged release ships an installer for macOS, Linux and Windows (Python/Nuitka).
 The installer downloads the matching release from GitHub, so it only works after this repository
-is published and the version is tagged.
+is published and the version is tagged. Windows releases use `noir-installer-windows.exe`; accept
+the UAC prompt so fx-autoconfig can write to the browser install folder.
 
 ```bash
-python3 installer/installer.py            # install (interactive)
+python3 installer/installer.py            # macOS/Linux install (interactive)
 python3 installer/installer.py --uninstall --profile <profile>   # uninstall
 ```
 

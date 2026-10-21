@@ -1,6 +1,10 @@
 @echo off
 setlocal EnableDelayedExpansion
 
+:: LEGACY / SOURCE INSTALL ONLY
+:: Releases ship noir-installer-windows.exe, built from installer.py with Nuitka.
+:: This Git-based batch is kept for source checkouts and has no uninstall support.
+
 :: --- ELEVATION CATCH ---
 :: If re-launched as Admin, load saved variables and jump straight to Step 6
 if "%~1"=="ELEVATED" (
@@ -9,7 +13,7 @@ if "%~1"=="ELEVATED" (
 )
 
 :: ============================================================================
-:: Natsumi Browser Installer - Specific File Map
+:: Noir Browser Installer (legacy) - Specific File Map
 :: ============================================================================
 
 cd /d "%~dp0"
@@ -35,7 +39,7 @@ mkdir "%TEMP_DIR%"
 
 echo.
 echo ==================================================
-echo        NATSUMI BROWSER INSTALLER (WINDOWS)
+echo        NOIR BROWSER INSTALLER (WINDOWS, LEGACY)
 echo ==================================================
 echo.
 
@@ -134,10 +138,10 @@ echo.
 set /p "VER_CHOICE=Enter choice (1 or 2): "
 
 if "%VER_CHOICE%"=="2" (
-    set "NATSUMI_BRANCH=dev"
+    set "NOIR_BRANCH=dev"
     echo [INFO] Selected Alpha version (Branch: dev^)
 ) else (
-    set "NATSUMI_BRANCH=main"
+    set "NOIR_BRANCH=main"
     echo [INFO] Selected Beta/Stable version (Branch: main^)
 )
 
@@ -170,10 +174,10 @@ echo.
 echo [STEP 4] Downloading files...
 cd /d "%TEMP_DIR%" || exit /b
 
-echo Cloning Noir Browser (%NATSUMI_BRANCH%)...
-git clone -b %NATSUMI_BRANCH% --depth 1 --single-branch https://github.com/rinne05/noir-browser.git natsumi
+echo Cloning Noir Browser (%NOIR_BRANCH%)...
+git clone -b %NOIR_BRANCH% --depth 1 --single-branch https://github.com/rinne05/noir-browser.git natsumi
 if %errorlevel% neq 0 ( 
-    echo [ERROR] Git Clone failed. Check if branch '%NATSUMI_BRANCH%' exists and you've installed Git.
+    echo [ERROR] Git Clone failed. Check if branch '%NOIR_BRANCH%' exists and you've installed Git.
     pause 
     exit /b 
 )
@@ -319,7 +323,8 @@ if %errorlevel% neq 0 (
 )
 :: Rename config.js for LibreWolf (copy directly to new name)
 if "%SELECTION%"=="4" (
-    copy /y "%TEMP_DIR%\fx-autoconfig\program\config.js" "%PROFILE_ROOT_PATH%\librewolf.overrides.cfg" >nul
+    if not exist "%USERPROFILE%\.librewolf" mkdir "%USERPROFILE%\.librewolf"
+    copy /y "%TEMP_DIR%\fx-autoconfig\program\config.js" "%USERPROFILE%\.librewolf\librewolf.overrides.cfg" >nul
 )
 
 :: defaults folder

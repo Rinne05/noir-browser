@@ -32,6 +32,7 @@ Actions → **Build & release** → Run workflow → select tag `v6.12.4`.
 
 1. `check-version` verifies the three version files.
 2. `build-installer` builds the macOS (arm64 + Intel), Linux and Windows artifacts with Nuitka.
+   The Windows artifact is `noir-installer-windows.exe`; the legacy batch is not shipped.
 3. `release` creates a **draft** GitHub release with the artifacts.
 4. `publish` (environment-gated, environment name = tag) runs `release-scripts/write_manifest.py`,
    which downloads the tag archive, computes its SHA-256 and writes `updates/<branch>.json`,

@@ -5,7 +5,7 @@ Two ways to put Noir into a browser profile:
 | Tool | Use it for | Downloads from |
 |---|---|---|
 | `dev-install.sh` | development (symlink, edits live after restart) | nothing (uses this repo) |
-| `installer.py` | release install/uninstall (the binary shipped in releases) | GitHub tag archives |
+| `installer.py` | release install/uninstall (the binary shipped in releases for macOS, Linux and Windows) | GitHub tag archives |
 
 ## dev-install.sh
 
@@ -68,16 +68,33 @@ directories). Legacy `natsumi-*` artifacts and the old `natsumi/` layout are sti
 
 ```bash
 pip install -r installer/requirements.txt   # requests, certifi
-python3 installer/test_installer.py         # 99 checks, including a full offline install→uninstall round trip
+python3 installer/test_installer.py         # 110 checks, including a full offline install→uninstall round trip
 ```
 
 The suite uses temporary fixtures only (it patches downloads and never touches a real browser).
 
 ## Windows
 
-`windows-installer.bat` installs from the `main`/`dev` branches on GitHub, copies the profile
-files and the fx-autoconfig program files (requires Administrator). It is shipped in releases as
-`noir-installer.bat`.
+Windows releases ship `noir-installer-windows.exe`, built from `installer.py` with Nuitka. It
+supports the same interactive install/uninstall flow, install manifest and safety behaviour as the
+macOS/Linux binaries. Because fx-autoconfig writes `config.js` and `defaults/pref` into the browser
+install folder, the executable requests Administrator rights through its UAC manifest; accept the
+prompt. Profile files still go to the selected profile's `chrome/` folder.
+
+To build it locally on Windows:
+
+```powershell
+pip install nuitka -r installer/requirements.txt
+python -m nuitka --onefile --windows-uac-admin `
+  --include-data-files="installer/installer.json=installer.json" `
+  installer/installer.py
+```
+
+Or run the **Build (no release)** workflow and download the `noir-installer-windows` artifact.
+
+`windows-installer.bat` is the legacy Git-based script kept for source checkouts. It installs from
+the `main`/`dev` branches, has no uninstall or install manifest, and is no longer shipped in
+releases.
 
 ## Notes
 

@@ -437,6 +437,107 @@ def main():
     check('symlinked config removed', not os.path.islink(chrome / 'noir-config.css') and not (chrome / 'noir-config.css').exists())
     check('symlinked loaders removed', not (chrome / 'userChrome.css').exists() and not (chrome / 'userContent.css').exists())
 
+    # ---- Scenario 17: Windows detection helpers ----
+    print('\n[Scenario 17] Windows browser/profile detection')
+    winroot = ROOT / 'windows'
+    roaming = winroot / 'Roaming'
+    firefox_root = roaming / 'Mozilla' / 'Firefox'
+    profile = firefox_root / 'Profiles' / 'abc123.default-release'
+    profile.mkdir(parents=True)
+    (profile / 'prefs.js').write_text('// prefs\n')
+    (firefox_root / 'profiles.ini').write_text(
+        '[Profile0]\n'
+        'Name=default-release\n'
+        'IsRelative=1\n'
+        'Path=Profiles/abc123.default-release\n'
+        'Default=1\n'
+        '\n'
+        '[Profile1]\n'
+        'Name=missing\n'
+        'IsRelative=1\n'
+        'Path=Profiles/does-not-exist\n')
+    module = load_installer_module()
+
+    with mock.patch.dict(os.environ, {'APPDATA': str(roaming)}):
+        detected_root = module._get_windows_path(module.browsers[0])
+        detected_profiles = module.get_profiles(detected_root)
+    check('Windows Firefox profile root detected', detected_root == str(firefox_root))
+    check('profiles.ini profile detected', detected_profiles == [str(profile)])
+    check('direct profile path accepted', module.get_profiles(str(profile)) == [str(profile)])
+
+    program_files = winroot / 'Program Files'
+    install_dir = program_files / 'Mozilla Firefox'
+    install_dir.mkdir(parents=True)
+    (install_dir / 'firefox.exe').write_text('')
+    with mock.patch.dict(os.environ, {
+            'ProgramFiles': str(program_files),
+            'ProgramFiles(x86)': '',
+            'LOCALAPPDATA': str(winroot / 'LocalAppData')}):
+        detected_install = module._get_windows_install_path(module.browsers[0])
+    check('Windows install path detected', detected_install == str(install_dir))
+
+    local_appdata = winroot / 'LocalAppData'
+    floorp_dir = local_appdata / 'Programs' / 'Floorp'
+    floorp_dir.mkdir(parents=True)
+    (floorp_dir / 'floorp.exe').write_text('')
+    with mock.patch.dict(os.environ, {
+            'ProgramFiles': '',
+            'ProgramFiles(x86)': '',
+            'LOCALAPPDATA': str(local_appdata)}):
+        detected_floorp = module._get_windows_install_path(module.browsers[1])
+    check('Windows per-user install path detected', detected_floorp == str(floorp_dir))
+
+    registry_install = winroot / 'Registry Firefox'
+    registry_install.mkdir(parents=True)
+    (registry_install / 'firefox.exe').write_text('')
+    fake_registry = SimpleNamespace(
+        HKEY_LOCAL_MACHINE=1,
+        HKEY_CURRENT_USER=2,
+        KEY_WOW64_64KEY=4,
+        KEY_WOW64_32KEY=8,
+        KEY_READ=16,
+    )
+    class FakeKey:
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            return False
+    def fake_open_key(hive, key_path, reserved, access):
+        if key_path == r'SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\firefox.exe':
+            return FakeKey()
+        raise OSError
+    def fake_query_value(key, name):
+        return (str(registry_install / 'firefox.exe'), 1)
+    fake_registry.OpenKey = fake_open_key
+    fake_registry.QueryValueEx = fake_query_value
+    with mock.patch.dict(sys.modules, {'winreg': fake_registry}), \
+         mock.patch.dict(os.environ, {
+             'ProgramFiles': '',
+             'ProgramFiles(x86)': '',
+             'LOCALAPPDATA': ''}):
+        detected_registry = module._get_windows_install_path(module.browsers[0])
+    check('Windows registry install path detected', detected_registry == str(registry_install))
+
+    waterfox_root = roaming / 'Waterfox'
+    (waterfox_root / 'Profiles' / 'wolf.default').mkdir(parents=True)
+    with mock.patch.dict(os.environ, {'APPDATA': str(roaming)}):
+        detected_waterfox = module._get_windows_path(module.browsers[2])
+    check('Windows Waterfox profile root detected', detected_waterfox == str(waterfox_root))
+
+    with mock.patch.object(module.sys, 'platform', 'win32'), \
+         mock.patch('ctypes.windll', create=True) as windll:
+        windll.shell32.IsUserAnAdmin.return_value = 1
+        check('Windows admin detection true', module.get_admin() is True)
+        windll.shell32.IsUserAnAdmin.return_value = 0
+        check('Windows admin detection false', module.get_admin() is False)
+
+    with mock.patch.object(module.sys, 'platform', 'win32'), \
+         mock.patch.object(module, '_get_windows_install_path', return_value=str(install_dir)), \
+         mock.patch.object(module, '_get_windows_path', return_value=str(firefox_root)):
+        detected_install, detected_profiles = module.detect_install_and_profiles(module.browsers[0])
+    check('Windows detect install path', detected_install == str(install_dir))
+    check('Windows detect profiles', detected_profiles == [str(profile)])
+
     # ---- Summary ----
     failed = [r for r in results if not r[1]]
     print(f"\n{'='*60}\n{len(results) - len(failed)}/{len(results)} checks passed")
