@@ -138,7 +138,7 @@ jobs:
         with:
           name: ${{ env.RAW_VERSION }}
           tag: ${{ env.VERSION }}
-          commit: ${{ github.ref }}
+          commit: ${{ github.sha }}
           draft: true
           skipIfReleaseExists: true
           artifactErrorsFailBuild: true
