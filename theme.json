@@ -4,11 +4,11 @@
   "author": "rinne05",
   "name": "Noir Browser",
   "description": "Welcome to your personal internet.",
-  "version": "6.12.4",
-  "createdAt": "2024-12-06T10:19:47Z",
+  "version": "1.0.0",
+  "createdAt": "2026-10-19T10:30:17Z",
   "ai": "no",
   "readme": "https://raw.githubusercontent.com/rinne05/noir-browser/main/README.md",
-  "image": "https://github.com/rinne05/noir-browser/raw/main/images/natsumi-preview.webp",
+  "image": "https://github.com/rinne05/noir-browser/raw/main/images/main.webp",
   "style": {
     "chrome": "userChrome.css",
     "content": "userContent.css"

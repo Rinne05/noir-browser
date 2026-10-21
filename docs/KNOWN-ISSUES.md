@@ -25,8 +25,8 @@ path with a release copy, which silently ends the symlink workflow. While develo
 ## Update checks before the first published manifest
 
 The updater fetches `updates/<branch>.json` from this repository. Until the repository is pushed
-and a manifest is published, the request returns 404 and the updater logs an unhandled rejection
-on each browser window load (it has no `.catch`). Disabling the updater removes the noise.
+and a manifest is published, the request returns 404. The updater handles that failure and logs a
+normal console error; disabling the updater removes the noise.
 
 ## CSS-only installs
 

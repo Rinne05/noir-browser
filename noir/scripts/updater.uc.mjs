@@ -167,6 +167,8 @@ class NatsumiUpdater {
                 }, "chrome://natsumi/content/icons/lucide/update.svg", true);
                 notificationObject.addToContainer();
             }
+        }).catch((error) => {
+            console.error("Failed to check for updates:", error);
         });
     }
 

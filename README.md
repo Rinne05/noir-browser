@@ -4,7 +4,8 @@
 
 > **Noir Browser is not a standalone browser.** It is a `userChrome.css` / `userContent.css`
 > skin plus an optional set of privileged JS modules, applied on top of Firefox (140+) or a
-> compatible fork. It is based on Natsumi Browser 6.12.4 and remains GPLv3.
+> compatible fork. It is a fork of Natsumi Browser and remains GPLv3. Noir uses independent
+> semantic versioning; the first official release is `1.0.0`.
 
 ## Highlights
 
@@ -128,12 +129,13 @@ otherwise a published update replaces the `noir/` symlink with a release copy.
 | `userChrome.css` / `userContent.css` | Loaders only |
 | `installer/` | Installer/uninstaller, `dev-install.sh`, regression tests |
 | `updates/` | Update manifests (`<branch>.json`) |
-| `release-scripts/` | Version checks, manifest writer, i18n checker |
+| `release-scripts/` | Version bump/check, manifest writer, i18n checker |
 
 ```bash
 python3 installer/test_installer.py     # installer/uninstaller regression suite
 python3 release-scripts/check_i18n.py   # translation coverage
 python3 release-scripts/check_version.py main
+python3 release-scripts/bump_version.py 1.0.0 --branch stable   # bump all release manifests
 ```
 
 Contributor/agent context lives in [`AGENTS.md`](AGENTS.md).

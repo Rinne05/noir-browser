@@ -22,42 +22,74 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-# Yes, this file is copied from https://github.com/UnifierHQ/unifier
-# It's my own code though so no worries
-
 import json
+import re
 import sys
 
-branch = sys.argv[-1]
+VERSION_RE = re.compile(r"^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$")
+ALLOWED_BRANCHES = ("stable", "rc", "beta", "alpha")
+CHANNEL_FIELDS = {
+    "stable": "version",
+    "rc": "version_rc",
+    "beta": "version_beta",
+    "alpha": "version_alpha",
+}
 
-print("Detected branch:", branch)
+ref = sys.argv[-1] if len(sys.argv) > 1 else "main"
+print(f"Detected ref: {ref}")
 
-with open('noir/version.json', 'r') as file:
-    package_version = json.load(file)['version']
-with open('installer/installer.json', 'r') as file:
-    installer_data = json.load(file)["package"]
-    installer_versions = [installer_data["version"], installer_data["version_rc"], installer_data["version_beta"], installer_data["version_alpha"]]
-with open('theme.json', 'r') as file:
-    sine_version = json.load(file)['version']
+with open("noir/version.json", "r", encoding="utf-8") as file:
+    version_data = json.load(file)
+package_version = version_data["version"]
+branch = version_data.get("branch", "stable")
 
-if branch != "main":
-    print("Branch is not main, assuming prerelease. Sine version will not be checked.")
+with open("installer/installer.json", "r", encoding="utf-8") as file:
+    package = json.load(file)["package"]
 
-# Sanitize installer versions
-installer_versions = [version for version in installer_versions if version]
+with open("theme.json", "r", encoding="utf-8") as file:
+    sine_version = json.load(file)["version"]
 
-installer_match = package_version in installer_versions
-sine_match = package_version == sine_version or branch != "main"
-can_proceed = installer_match and sine_match
+is_tag = ref.startswith("v")
+check_sine = ref == "main" or is_tag
+version_match = bool(VERSION_RE.match(package_version))
+channel_field = CHANNEL_FIELDS.get(branch)
+channel_version = package.get(channel_field) if channel_field else None
+installer_versions = [
+    package[field]
+    for field in CHANNEL_FIELDS.values()
+    if package.get(field)
+]
+
+installer_match = channel_version == package_version
+tag_match = not is_tag or ref == f"v{package_version}"
+branch_match = branch in ALLOWED_BRANCHES
+sine_match = not check_sine or package_version == sine_version
+
+if not check_sine:
+    print("Not a main/tag build; Sine version check skipped.")
+
+if not version_match:
+    print(f"Invalid version format: {package_version} (expected semantic version, e.g. 1.0.0)")
+if not branch_match:
+    print(f"Invalid version branch: {branch} (allowed: {', '.join(ALLOWED_BRANCHES)})")
+if not tag_match:
+    print(f"Tag mismatch: expected v{package_version}, got {ref}")
+if not installer_match:
+    print(f"Installer channel mismatch: {branch} should be {package_version}, got {channel_version}")
+if not sine_match:
+    print(f"Sine version mismatch: expected {package_version}, got {sine_version}")
+
+can_proceed = version_match and installer_match and tag_match and branch_match and sine_match
 
 if can_proceed:
     print("Version matches!")
 else:
     print("Version mismatch, cannot build!")
 
-# Print version info
 print(f"- Package version (noir/version.json): {package_version}")
-print(f"- Installer versions (installer/installer.json): {'/'.join(installer_versions)}")
+print(f"- Version branch/channel: {branch}")
+print(f"- Installer version for channel: {channel_version}")
+print(f"- Installer versions: {'/'.join(installer_versions)}")
 print(f"- Sine version (theme.json): {sine_version}")
 
 if not can_proceed:

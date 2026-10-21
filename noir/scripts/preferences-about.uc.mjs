@@ -36,7 +36,7 @@ import {t, localizeDom} from "./i18n.sys.mjs";
 
 let version;
 let branch;
-let codename;
+let codename = null;
 
 let categoryNode = document.getElementById("categories");
 const hasRedesign = categoryNode.nodeName === "html:moz-page-nav";
@@ -231,7 +231,9 @@ function addAboutPane() {
     nameNode.textContent = natsumiName;
 
     let versionNode = document.getElementById("natsumi-about-version");
-    versionNode.textContent = `${t("Version")} ${version} (${codename})`;
+    versionNode.textContent = codename
+        ? `${t("Version")} ${version} (${codename})`
+        : `${t("Version")} ${version}`;
 
     let browserVersionNode = document.getElementById("natsumi-about-browser-version");
     if (forkedFox) {
@@ -305,7 +307,7 @@ for (let localizeRoot of document.querySelectorAll('[data-category^="paneNatsumi
     console.error("Failed to fetch Natsumi version:", error);
     version = "Unknown";
     branch = "stable";
-    codename = "Unknown";
+    codename = null;
     addToSidebar();
     addAboutPane();
 });
